@@ -19,6 +19,11 @@ export interface IQuestion{
     isPre: boolean;
     isRequired: boolean;
 }
+export interface IAlert{
+  key: string;
+  value: string;
+  created: string;
+}
 
 
 export type PositionType = "LONG" | "SHORT" | "CLOSED";
