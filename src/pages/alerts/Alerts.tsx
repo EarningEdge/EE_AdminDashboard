@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import {
-  Tag,
+
   Button,
   Space,
   Drawer,
   Form,
   Input,
-  Select,
-  Checkbox,
+  // Select,
+
   Modal,
-  Switch,
+
   message,
 } from "antd";
 
@@ -18,15 +18,15 @@ import DeleteIcon from "../../assets/images/trash.svg";
 import axios from "axios";
 import { IAlert, IQuestion } from "../../types/data";
 import CustomTable from "../../components/common/table/CustomTable";
-import useQuestionsService from "../../hooks/useQuestion";
+// import useQuestionsService from "../../hooks/useQuestion";
 import { PlusCircleOutlined } from "@ant-design/icons";
-import useAxios from "../../hooks/useAxios";
+// import useAxios from "../../hooks/useAxios";
 import { useAppSelector } from "../../redux/hooks";
-import { ReloadOutlined } from "@ant-design/icons";
+// import { ReloadOutlined } from "@ant-design/icons";
 import CustomLayout from "../../components/layout/custom-layout/CustomLayout";
 import useAlertsService from "../../hooks/useAlert";
 
-const { Option } = Select;
+// const { Option } = Select;
 
 const ALERT_URL = import.meta.env.VITE_BASE_URL + "/adminAlert";
 
@@ -40,16 +40,16 @@ const Alerts: React.FC = () => {
   );
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [refresh, setRefresh] = useState(false);
+  // const [refresh, setRefresh] = useState(false);
   const [form] = Form.useForm();
-  const axiosInstance = useAxios();
+  // const axiosInstance = useAxios();
 
   const token = useAppSelector((state) => state.auth.token);
   console.log("token: ", token);
 
   useEffect(() => {
     fetchAlerts();
-  }, [refresh]);
+  }, []);
 
   const fetchAlerts = async () => {
     try {
@@ -164,9 +164,9 @@ const Alerts: React.FC = () => {
   //   }
   // };
 
-  const refreshTable = () => {
-    setRefresh(!refresh);
-  };
+  // const refreshTable = () => {
+  //   setRefresh(!refresh);
+  // };
 
   const columns = [
     {

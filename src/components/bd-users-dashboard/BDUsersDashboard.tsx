@@ -8,11 +8,11 @@ import useBDUserService from "../../hooks/useBDUserService";
 import { IUser, ISales } from "../../types/data";
 import { ColumnsType } from "antd/es/table";
 import CustomTable from "../common/table/CustomTable";
-import { useAppSelector } from "../../redux/hooks";
+// import { useAppSelector } from "../../redux/hooks";
 
 const BDUsersDashboard: React.FC = () => {
   const { getAllUsers, getSalesData, toggleBDUser } = useBDUserService();
-  const user = useAppSelector((state) => state.auth.user);
+  // const user = useAppSelector((state) => state.auth.user);
   const [users, setUsers] = useState<IUser[]>([]);
   const [originalUsers, setOriginalUsers] = useState<IUser[]>([]);
 
@@ -77,7 +77,15 @@ const BDUsersDashboard: React.FC = () => {
   }, [searchTerm]);
 
   const onToggle = async(userId: string) => {
-    const res = await toggleBDUser(userId)
+    try {
+      
+      const res = await toggleBDUser(userId)
+      if(res.status===200){
+  
+      }
+    } catch (error) {
+      
+    }
   }
 
   const getUserCount = (userId: string) => {

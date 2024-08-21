@@ -104,21 +104,21 @@ const BDUserProfile = () => {
     setSelectedYear(date.year());
   };
 
-  const transformDataToArray = (data: any) => {
-    if (!data || !data.data) return [];
-    return Object.entries(data.data).map(([key, value]) => ({
-      key: key,
-      value: value,
-      title: key
-        .replace(/([A-Z])/g, " $1")
-        .replace(/^./, (str) => str.toUpperCase()),
-    }));
-  };
+  // const transformDataToArray = (data: any) => {
+  //   if (!data || !data.data) return [];
+  //   return Object.entries(data.data).map(([key, value]) => ({
+  //     key: key,
+  //     value: value,
+  //     title: key
+  //       .replace(/([A-Z])/g, " $1")
+  //       .replace(/^./, (str) => str.toUpperCase()),
+  //   }));
+  // };
 
-  const dataArray = React.useMemo(
-    () => transformDataToArray(profileData),
-    [profileData]
-  );
+  // const dataArray = React.useMemo(
+  //   () => transformDataToArray(profileData),
+  //   [profileData]
+  // );
 
   const pnlCategories =
     pnlDataResponse?.data?.map((item) => dayjs(item._id).format("DD MMM")) ||

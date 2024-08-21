@@ -24,7 +24,7 @@ const UsersDashboard: React.FC = () => {
 
   const [isLoading,setIsLoading] = useState(false);
   const [searchTerm,setSearchTerm] = useState("");
-  const [refresh, setRefresh] = useState(false)
+  // const [refresh, setRefresh] = useState(false)
 
 
   const fetchAllUser = async () => {
@@ -46,12 +46,7 @@ const UsersDashboard: React.FC = () => {
   useEffect(() => {
     fetchAllUser();
   }, []);
-  
-  useEffect(() => {
-    if (searchTerm !== "") {
-      const filteredUser = users.filter((user) => {
-  },[refresh])
-      
+
   useEffect(()=>{
     if(searchTerm!==""){
       const filteredUser = users.filter((user)=>{
@@ -77,7 +72,14 @@ const UsersDashboard: React.FC = () => {
   };
 
   const onToggle = async(userId: string) => {
-    const res = await toggleBDUser(userId)
+    try {
+      const res = await toggleBDUser(userId)
+      if(res.status===200){
+        
+      }
+    } catch (error) {
+      
+    }
   };
 
   const columns: ColumnsType<IUser> = [
@@ -166,9 +168,9 @@ const UsersDashboard: React.FC = () => {
       },
     },
   ];
-  const refreshTable = ()=>{
-    setRefresh(!refresh)
-  }
+  // const refreshTable = ()=>{
+  //   setRefresh(!refresh)
+  // }
 
   return (
 
