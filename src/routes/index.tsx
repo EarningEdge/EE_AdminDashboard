@@ -22,7 +22,12 @@ const MentorDashboard = lazy((): any => import("../pages/mentor-dashboard/Mentor
 const AdminDashboard = lazy((): any => import("../pages/admin-dashboard/AdminDashboard"));
 const CommunityPage = lazy((): any => import("../pages/community"));
 const LivePage = lazy((): any => import("../pages/live/LivePage"));
+
+const AllBDUSers = lazy((): any => import("../pages/all-bd-users/AllBDUsers"));
+const BDUserProfile = lazy((): any => import("../pages/bd-user-profile/BDUserProfile"));
+
 const AlertPage = lazy((): any => import("../pages/alerts/Alerts"));
+
 
 const router = createBrowserRouter([
   {
@@ -61,7 +66,12 @@ const router = createBrowserRouter([
           { path: "create-mentor", element: <CreateMentor /> },
           { path: "community", element: <CommunityPage /> },
           { path: "live", element: <LivePage /> },
+
+          { path: "sales", element: <AllBDUSers /> },
+          { path: "sales/:userId", element: <BDUserProfile /> },
+
           { path: "alerts", element: <AlertPage /> },
+
         ],
       },
       {

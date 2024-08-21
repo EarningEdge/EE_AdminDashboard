@@ -62,6 +62,9 @@ export const adminItems = [
   },
   {
     key: "10",
+    icon: React.createElement(LineChartOutlined),
+    label: "BD Users",
+    path: "/admin/sales",
     icon: React.createElement(BellOutlined),
     label: "Admin Alerts",
     path: "/admin/alerts",

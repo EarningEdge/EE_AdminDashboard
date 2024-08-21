@@ -2,30 +2,25 @@ import React, { useEffect, useState } from "react";
 import { Button, Input, Tag } from "antd";
 // import { CloudDownloadOutlined } from '@ant-design/icons'
 
-
 import { Flex } from "antd";
 import { Switch } from "antd";
-import useUserService from "../../hooks/useUserService";
-import { IUser } from "../../types/data";
+import useBDUserService from "../../hooks/useBDUserService";
+import { IUser, ISales } from "../../types/data";
 import { ColumnsType } from "antd/es/table";
 import CustomTable from "../common/table/CustomTable";
 import { useAppSelector } from "../../redux/hooks";
-import useBDUserService from "../../hooks/useBDUserService";
 
-
-const UsersDashboard: React.FC = () => {
-  const { getAllUsers } = useUserService();
-  const { toggleBDUser } = useBDUserService();
+const BDUsersDashboard: React.FC = () => {
+  const { getAllUsers, getSalesData, toggleBDUser } = useBDUserService();
   const user = useAppSelector((state) => state.auth.user);
   const [users, setUsers] = useState<IUser[]>([]);
   const [originalUsers, setOriginalUsers] = useState<IUser[]>([]);
 
   const [totalUsers, setTotalUsers] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const [isLoading,setIsLoading] = useState(false);
-  const [searchTerm,setSearchTerm] = useState("");
-  const [refresh, setRefresh] = useState(false)
-
+  const [salesData, setSalesData] = useState<ISales[]>([]);
 
   const fetchAllUser = async () => {
     try {
@@ -43,19 +38,29 @@ const UsersDashboard: React.FC = () => {
     }
   };
 
+  const fetchSalesData = async () => {
+    try {
+      setIsLoading(true);
+      const res = await getSalesData();
+      if (res.status === 200) {
+        setSalesData(res.data.data);
+        // setOriginalUsers(res.data.data);
+        // setTotalUsers(res.data.data.length);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchAllUser();
+    fetchSalesData();
   }, []);
-  
   useEffect(() => {
     if (searchTerm !== "") {
       const filteredUser = users.filter((user) => {
-  },[refresh])
-      
-  useEffect(()=>{
-    if(searchTerm!==""){
-      const filteredUser = users.filter((user)=>{
-
         const lowerSearchTerm = searchTerm.toLowerCase();
         const { email, firstName, lastName } = user;
         if (
@@ -71,20 +76,21 @@ const UsersDashboard: React.FC = () => {
     }
   }, [searchTerm]);
 
-
-  const assignBD = () => {
-
-  };
-
   const onToggle = async(userId: string) => {
     const res = await toggleBDUser(userId)
+  }
+
+  const getUserCount = (userId: string) => {
+    // Call API
+    const user = salesData.find((data) => data.userId === userId);
+    return user?.usersCount;
   };
 
   const columns: ColumnsType<IUser> = [
     {
       title: "",
       dataIndex: "profile",
-      key: "email",
+      key: "profile",
       render: (_, record) => (
         <img
           height={40}
@@ -118,15 +124,6 @@ const UsersDashboard: React.FC = () => {
       sorter: (a, b) => a.email.localeCompare(b.email),
     },
     {
-      title: "Mentor",
-      dataIndex: "mentor",
-      key: "mentor",
-      render: (_, record: any) =>
-        record.mentor
-          ? record.mentor.firstName + " " + record.mentor.lastName
-          : `Not assigned`,
-    },
-    {
       title: "Occupation",
       dataIndex: "occupation",
       key: "occupation",
@@ -134,22 +131,18 @@ const UsersDashboard: React.FC = () => {
         `${!record.occupation ? "Couldn't fetch" : record.occupation}`,
     },
     {
-      title: "Broker Connected",
-      dataIndex: "isBrokerConnected",
-      key: "isBrokerConnected",
-      render: (isBrokerConnected: boolean) => (
-        <Tag color={isBrokerConnected ? "green" : "red"}>
-          {isBrokerConnected ? "Connected" : "Not Connected"}
-        </Tag>
-      ),
-      sorter: (a, b) =>
-        Number(a.isBrokerConnected) - Number(b.isBrokerConnected),
+      title: "User Count",
+      dataIndex: "user-count",
+      key: "user-count",
+      render: (_, record) => {
+        return getUserCount(String(record._id));
+      },
     },
     {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Button type="link" href={`/${user?.role}/user/${record._id}`}>
+        <Button type="link" href={`/admin/sales/${record._id}`}>
           View Profile
         </Button>
       ),
@@ -157,33 +150,23 @@ const UsersDashboard: React.FC = () => {
     {
       title: "Toggle BD Status",
       key: "togglebd",
-      render: (_, record) => {
-        return record.referralCode === null ? (
-          <Switch defaultChecked={false} onChange={assignBD} />
-        ) : (
-          <Switch value={record.isBD} onChange={()=>{onToggle(String(record._id))}} />
-        );
-      },
+      render: (_, record) =>(
+        <Switch value={record.isBD} onChange={()=>{onToggle(String(record._id))}} />
+      )
     },
   ];
-  const refreshTable = ()=>{
-    setRefresh(!refresh)
-  }
 
   return (
-
     <div className="p-10">
-      <h1 className="text-2xl font-bold mb-4">All USERS</h1>
+      <h1 className="text-2xl font-bold mb-4">All BD USERS</h1>
       <div className="border border-[#EAECF0]">
         <Flex justify="space-between" align="center" className="px-6 py-6">
-
           <div>
             <p>
               <span className="text-lg font-bold mr-2"> Users</span>
               <Tag color="cyan">Total Users: {totalUsers}</Tag>
             </p>
           </div>
-
           <div className="w-1/4">
             <Input.Search
               onChange={(e) => {
@@ -196,7 +179,6 @@ const UsersDashboard: React.FC = () => {
           {/* <Button type='default' icon={<CloudDownloadOutlined />}>
             Export
           </Button> */}
-
         </Flex>
       </div>
       <CustomTable
@@ -210,4 +192,4 @@ const UsersDashboard: React.FC = () => {
   );
 };
 
-export default UsersDashboard;
+export default BDUsersDashboard;

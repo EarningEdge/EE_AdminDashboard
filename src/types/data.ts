@@ -8,6 +8,15 @@ export interface IUser{
     occupation?:string;
     isBrokerConnected?:boolean;
     profile_image_url?:string;
+    isBD?: boolean; 
+    referralCode: string;
+}
+export interface ISales{
+  _id: string;
+  referralCode: string;
+  userId: string;
+  usersCount: number;
+  paidUsersCount: number;
 }
 export interface IQuestion{
     key: string;
