@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Input, Tag } from "antd";
 // import { CloudDownloadOutlined } from '@ant-design/icons'
 
+
 import { Flex } from "antd";
 import { Switch } from "antd";
 import useUserService from "../../hooks/useUserService";
@@ -11,6 +12,7 @@ import CustomTable from "../common/table/CustomTable";
 import { useAppSelector } from "../../redux/hooks";
 import useBDUserService from "../../hooks/useBDUserService";
 
+
 const UsersDashboard: React.FC = () => {
   const { getAllUsers } = useUserService();
   const { toggleBDUser } = useBDUserService();
@@ -19,8 +21,11 @@ const UsersDashboard: React.FC = () => {
   const [originalUsers, setOriginalUsers] = useState<IUser[]>([]);
 
   const [totalUsers, setTotalUsers] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+
+  const [isLoading,setIsLoading] = useState(false);
+  const [searchTerm,setSearchTerm] = useState("");
+  const [refresh, setRefresh] = useState(false)
+
 
   const fetchAllUser = async () => {
     try {
@@ -41,9 +46,16 @@ const UsersDashboard: React.FC = () => {
   useEffect(() => {
     fetchAllUser();
   }, []);
+  
   useEffect(() => {
     if (searchTerm !== "") {
       const filteredUser = users.filter((user) => {
+  },[refresh])
+      
+  useEffect(()=>{
+    if(searchTerm!==""){
+      const filteredUser = users.filter((user)=>{
+
         const lowerSearchTerm = searchTerm.toLowerCase();
         const { email, firstName, lastName } = user;
         if (
@@ -154,18 +166,24 @@ const UsersDashboard: React.FC = () => {
       },
     },
   ];
+  const refreshTable = ()=>{
+    setRefresh(!refresh)
+  }
 
   return (
+
     <div className="p-10">
       <h1 className="text-2xl font-bold mb-4">All USERS</h1>
       <div className="border border-[#EAECF0]">
         <Flex justify="space-between" align="center" className="px-6 py-6">
+
           <div>
             <p>
               <span className="text-lg font-bold mr-2"> Users</span>
               <Tag color="cyan">Total Users: {totalUsers}</Tag>
             </p>
           </div>
+
           <div className="w-1/4">
             <Input.Search
               onChange={(e) => {
@@ -178,6 +196,7 @@ const UsersDashboard: React.FC = () => {
           {/* <Button type='default' icon={<CloudDownloadOutlined />}>
             Export
           </Button> */}
+
         </Flex>
       </div>
       <CustomTable

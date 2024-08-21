@@ -78,7 +78,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
   }
 
   return (
-    <div className='flex-1'>
+    <div className='flex-1 dark:bg-dark-blue'>
       <ReactApexChart
         //@ts-ignore
         options={options}

@@ -12,6 +12,8 @@ import { Message, Conversation, IUser } from "../../types/data";
 import UserList from "../users-list-modal";
 import useFetchData from "../../hooks/useFetchData";
 import Chats from "../../components/chat-item";
+import { Content } from "antd/es/layout/layout";
+import { RealtimeChannel } from "@supabase/supabase-js";
 
 const { Sider } = Layout;
 
@@ -21,24 +23,81 @@ const ChatPage: React.FC = () => {
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
-
   const [selectedConversation, setSelectedConversation] = useState<
     string | null
   >(null);
 
   const [isUserListVisible, setIsUserListVisible] = useState(false);
 
-  const { data: traders } = useFetchData<{ status: string; data: IUser[] }>(
+  let { data: traders } = useFetchData<{ status: string; data: IUser[] }>(
     `/user/all`
   );
+  let filteredTraders: IUser[]=[]
+  //After fetching all the traders to start a convo, we will remove the user who are already in conversation
+  if(traders){
+    filteredTraders = traders?.data?.filter((user:IUser)=> !conversations.some((e)=>{return e.participants.includes(user._id)}))
+  }
 
   //USE_EFFECTs
   useEffect(() => {
+    if (!supabase) return;
     fetchConversations();
-    setupRealtimeSubscriptions();
+    const conversationChannel: RealtimeChannel = supabase
+      .channel('public:conversations')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'conversations' },
+        (payload) => handleConversationChange(payload)
+      )
+      .subscribe((status) => {
+        console.log('Conversation subscription status:', status);
+      });
+
+    const messageDeleteChannel = supabase
+      .channel('public:messages:delete')
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'messages' },
+        (payload) => {
+          handleDeleteMessage(payload);
+        }
+      )
+      .subscribe((status) => {
+        console.log('Messages delete subscription status:', status);
+      });
+
+    const messageUpdateChannel = supabase
+      .channel('public:messages:update')
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'messages' },
+        (payload) => {
+          handleEditMessage(payload);
+        }
+      )
+      .subscribe((status) => {
+        console.log('Messages update subscription status:', status);
+      });
+
+    const messageInsertChannel = supabase
+      .channel('public:messages:insert')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages' },
+        (payload) => {
+          handleNewMessage(payload);
+        }
+      )
+      .subscribe((status) => {
+        console.log('Messages insert subscription status:', status);
+      });
 
     return () => {
-      supabase.removeAllChannels();
+      console.log('Removing channels');
+      supabase.removeChannel(conversationChannel);
+      supabase.removeChannel(messageDeleteChannel);
+      supabase.removeChannel(messageUpdateChannel);
+      supabase.removeChannel(messageInsertChannel);
     };
   }, []);
 
@@ -50,52 +109,7 @@ const ChatPage: React.FC = () => {
     }
   }, [selectedConversation]);
 
-  //Setting up the realtime subscriptions with the supabase dbs
-  const setupRealtimeSubscriptions = () => {
-    supabase
-      .channel("public:conversations")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "conversations" },
-        handleConversationChange
-      )
-      .subscribe((status) => {
-        console.log("Conversation subscription status:", status);
-      });
-
-    supabase
-      .channel("public:messages")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "messages" },
-        handleNewMessage
-      )
-      .subscribe((status) => {
-        console.log("Message insert subscription status:", status);
-      });
-
-    supabase
-      .channel("public:messages")
-      .on(
-        "postgres_changes",
-        { event: "DELETE", schema: "public", table: "messages" },
-        handleDeleteMessage
-      )
-      .subscribe((status) => {
-        console.log("Message delete subscription status:", status);
-      });
-
-    supabase
-      .channel("public:messages")
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "messages" },
-        handleEditMessage
-      )
-      .subscribe((status) => {
-        console.log("Message edit subscription status:", status);
-      });
-  };
+ 
 
   const handleConversationChange = (payload: any) => {
     if (payload.new && payload.new.participants.includes(user?._id)) {
@@ -117,7 +131,7 @@ const ChatPage: React.FC = () => {
       .from("messages")
       .delete()
       .eq("id", messageId);
-  
+
     if (error) {
       console.error("Error deleting message:", error);
       message.error("Failed to delete message");
@@ -131,7 +145,7 @@ const ChatPage: React.FC = () => {
       .from("messages")
       .update({ content: newContent })
       .eq("id", messageId);
-  
+
     if (error) {
       console.error("Error editing message:", error);
       message.error("Failed to edit message");
@@ -211,6 +225,7 @@ const ChatPage: React.FC = () => {
   };
 
   const startNewConversation = async (participantId: string) => {
+
     const { data, error } = await supabase
       .from("conversations")
       .insert({ participants: [user?._id, participantId] })
@@ -229,73 +244,91 @@ const ChatPage: React.FC = () => {
 
   return (
     <CustomLayout>
-      <Layout style={{ height: "90vh" }}>
-        <Sider width={200} theme="light" collapsible>
-          <Menu
-            mode="inline"
-            selectedKeys={[selectedConversation || GLOBAL_CHANNEL_ID]}
-            style={{ height: "100%", borderRight: 0 }}
-            onClick={({ key }) =>
-              setSelectedConversation(key === GLOBAL_CHANNEL_ID ? null : key)
-            }
-          >
-            <Menu.Item key={GLOBAL_CHANNEL_ID}>
-              <Avatar icon={<UserOutlined />} />
-              <span style={{ marginLeft: "10px" }}>Global Channel</span>
-            </Menu.Item>
-
-            {conversations.map((conv) => {
-              const otherUser = conv.participants.find((p) => p !== user?._id);
-              const otherUserData = traders?.data.find(
-                (u) => u._id === otherUser
-              ); // Assuming you have a users array
-              return (
-                <Menu.Item key={conv.id}>
-                  <Avatar
-                    src={otherUserData?.profile_image_url}
-                    icon={<UserOutlined />}
-                  />
-                  <span style={{ marginLeft: "10px" }}>
-                    {otherUserData
-                      ? `${otherUserData.firstName} ${otherUserData.lastName}`
-                      : "Unknown User"}
-                  </span>
-                </Menu.Item>
-              );
-            })}
-
-            <Menu.Item
-              onClick={() => {
-                setIsUserListVisible(true);
-              }}
-              key="new"
-            >
-              <Avatar icon={<UserOutlined />} />
-              <span style={{ marginLeft: "10px" }}>New Conversation</span>
-            </Menu.Item>
-          </Menu>
-        </Sider>
-        <Chats
-          messages={messages}
-          selectedConversation={selectedConversation}
-          deleteMessage={deleteMessage}
-          editMessage={editMessage}
-          setMessages={setMessages}
-        />
-      </Layout>
-      <Modal
-        title="Start New Conversation"
-        visible={isUserListVisible}
-        onCancel={() => setIsUserListVisible(false)}
-        footer={null}
+    <Layout style={{ height: "100%", display: "flex" }}>
+      <Sider
+        width={200}
+        theme="light"
+        style={{
+          overflowY: "auto",
+          height: "100%",
+          borderRight: "1px solid #f0f0f0",
+        }}
       >
-        <UserList
-          traders={traders?.data!}
-          onSelectUser={startNewConversation}
-        />
-      </Modal>
-    </CustomLayout>
+        <Menu
+          mode="inline"
+          selectedKeys={[selectedConversation || GLOBAL_CHANNEL_ID]}
+          style={{ height: "100%" }}
+          onClick={({ key }) =>
+            setSelectedConversation(key === GLOBAL_CHANNEL_ID ? null : key)
+          }
+        >
+              <Menu.Item key={GLOBAL_CHANNEL_ID}>
+                <Avatar icon={<UserOutlined />} />
+                <span style={{ marginLeft: "10px" }}>Global Channel</span>
+              </Menu.Item>
+
+              {conversations.map((conv) => {
+                const otherUser = conv.participants.find(
+                  (p) => p !== user?._id
+                );
+                const otherUserData = traders?.data.find(
+                  (u) => u._id === otherUser
+                );
+                return (
+                  <Menu.Item key={conv.id}>
+                    <Avatar
+                      src={otherUserData?.profile_image_url}
+                      icon={<UserOutlined />}
+                    />
+                    <span style={{ marginLeft: "10px" }}>
+                      {otherUserData
+                        ? `${otherUserData.firstName} ${otherUserData.lastName}`
+                        : "Unknown User"}
+                    </span>
+                  </Menu.Item>
+                );
+              })}
+
+              <Menu.Item
+                onClick={() => {
+                  setIsUserListVisible(true);
+                }}
+                key="new"
+              >
+                <Avatar icon={<UserOutlined />} />
+                <span style={{ marginLeft: "10px" }}>New Conversation</span>
+              </Menu.Item>
+              </Menu>
+      </Sider>
+      <Layout style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        <Content
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            display: "flex",
+            flexDirection: "column",
+            padding: "20px",
+          }}
+        >
+          <Chats
+            messages={messages}
+            selectedConversation={selectedConversation}
+            deleteMessage={deleteMessage}
+            editMessage={editMessage}
+            setMessages={setMessages}
+          />
+        </Content>
+      </Layout>
+    </Layout>
+    <Modal
+      title="Start New Conversation"
+      visible={isUserListVisible}
+      onCancel={() => setIsUserListVisible(false)}
+      footer={null}
+    >
+      <UserList traders={filteredTraders} onSelectUser={startNewConversation} />
+    </Modal>
+  </CustomLayout>
   );
 };
-
 export default ChatPage;

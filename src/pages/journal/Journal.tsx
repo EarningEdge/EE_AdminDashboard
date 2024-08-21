@@ -3,7 +3,7 @@ import {
   Carousel,
   CarouselProps,
   Drawer,
-  List,
+  // List,
   Tag,
   Rate,
   Form as AntdForm,
@@ -11,7 +11,7 @@ import {
   message,
   Upload,
   DatePicker,
-  ConfigProvider,
+  ConfigProvider
 } from 'antd'
 
 import CustomTable from '../../components/common/table/CustomTable'
@@ -31,9 +31,11 @@ import { UploadOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import { JournalTypeSelector } from '../../components/common/journal-type-selector'
 import { ReviewTypeSelector } from '../../components/common/journal-review-selector'
+import JournalMarketSection from '../../components/journal-section/JournalMarketSection'
+import { ReloadOutlined } from '@ant-design/icons'
 
 interface IFormInput {
-  review: string 
+  review: string
   rating: number
 }
 const schema = yup
@@ -46,7 +48,7 @@ const schema = yup
 const lightTheme = {
   token: {
     colorBgBase: '#ffffff',
-    colorText: '#000000',
+    colorText: '#000000'
   }
 }
 
@@ -86,7 +88,9 @@ const Journal = () => {
   const [showSideDrawer, setShowSideDrawer] = useState(false)
   const [showAddReviewDrawer, setShowAddReviewDrawer] = useState(false)
   const [selectedJournal, setSelectedJournal] = useState<null | any>(null)
-  
+  const [preData, setPreData] = useState<null | any>(null)
+  const [postDatas, setPostDatas] = useState<null | any>(null)
+  const [refresh, setRefresh] = useState(false)
   const [fileList, setFileList] = useState<any[]>([])
   const { RangePicker } = DatePicker
 
@@ -94,7 +98,7 @@ const Journal = () => {
     searchTerm: '',
     journalType: '',
     reviewStatus: '',
-    dateRange: [dayjs().format("YYYY-MM-DD"), dayjs().format("YYYY-MM-DD")]
+    dateRange: [dayjs().format('YYYY-MM-DD'), dayjs().format('YYYY-MM-DD')]
   })
 
   const {
@@ -112,12 +116,16 @@ const Journal = () => {
     // error,
     fetchData
   } = useFetchData<any>(
-    `journal/all/${user.role}?searchTerm=${filters.searchTerm}&type=${filters.journalType}&reviewStatus=${filters.reviewStatus}&fromDate=${filters.dateRange[0]}&toDate=${dayjs(filters.dateRange[1]).add(1,"day").format("YYYY-MM-DD")}`
+    `journal/all/${user.role}?searchTerm=${filters.searchTerm}&type=${
+      filters.journalType
+    }&reviewStatus=${filters.reviewStatus}&fromDate=${
+      filters.dateRange[0]
+    }&toDate=${dayjs(filters.dateRange[1]).add(1, 'day').format('YYYY-MM-DD')}`
   )
 
   useEffect(() => {
     fetchData()
-  }, [filters])
+  }, [filters,refresh ])
   const handleFilterChange = (filterName: string, value: string | string[]) => {
     setFilters(prevFilters => ({
       ...prevFilters,
@@ -150,6 +158,37 @@ const Journal = () => {
     }
   }
 
+  const handleViewClick = (journal: any) => {
+    setSelectedJournal(journal)
+
+    const journalDate = new Date(journal.createdAt).toISOString().split('T')[0] // Extract the date part
+
+    if (journal.type === 'exit') {
+      // Assuming `journalData.data` holds all your journal entries
+      const entryForSameDate = journalData.data.filter(
+        (item: any) =>
+          item.date === journal.date &&
+          item.type === 'entry' &&
+          new Date(item.createdAt).toISOString().split('T')[0] === journalDate
+      )
+
+      setPreData(entryForSameDate[0])
+      setPostDatas(journal)
+    } else {
+      const entryForSameDate = journalData.data.filter(
+        (item: any) =>
+          item.date === journal.date &&
+          item.type === 'exit' &&
+          new Date(item.createdAt).toISOString().split('T')[0] === journalDate
+      )
+
+      setPreData(journal)
+      setPostDatas(entryForSameDate[0])
+    }
+
+    setShowSideDrawer(true)
+  }
+
   const uploadProps = {
     onRemove: (file: any) => {
       setFileList(fileList.filter(f => f.uid !== file.uid))
@@ -171,7 +210,7 @@ const Journal = () => {
           <div>
             <Link to={`/${user.role}/user/${record?.userId?._id}`}>
               {record?.userId?.firstName
-                ? record?.userId?.firstName+" "+record?.userId?.lastName
+                ? record?.userId?.firstName + ' ' + record?.userId?.lastName
                 : "Couldn't fetch name"}
             </Link>
           </div>
@@ -217,6 +256,7 @@ const Journal = () => {
           onClick={() => {
             setShowSideDrawer(true)
             setSelectedJournal(record)
+            handleViewClick(record)
           }}
         >
           View
@@ -234,8 +274,110 @@ const Journal = () => {
       message.error(error?.message || 'Failed to add')
     }
   }
+  const refreshTable = ()=>{
+    setRefresh(!refresh)
+  }
 
   const darkMode = useAppSelector(state => state.theme.darkMode)
+  console.log(selectedJournal, 'selectedJournal')
+  console.log(preData, 'preData')
+  console.log(postDatas, 'postDatas')
+  const profitLossColumns = [
+    {
+      title: 'Client ID',
+      dataIndex: 'dhanClientId',
+      key: 'dhanClientId',
+    },
+    {
+      title: 'Trading Symbol',
+      dataIndex: 'tradingSymbol',
+      key: 'tradingSymbol',
+    },
+    {
+      title: 'Position Type',
+      dataIndex: 'positionType',
+      key: 'positionType',
+    },
+    {
+      title: 'Exchange Segment',
+      dataIndex: 'exchangeSegment',
+      key: 'exchangeSegment',
+    },
+    {
+      title: 'Product Type',
+      dataIndex: 'productType',
+      key: 'productType',
+    },
+    {
+      title: 'Buy Avg',
+      dataIndex: 'buyAvg',
+      key: 'buyAvg',
+    },
+    {
+      title: 'Buy Qty',
+      dataIndex: 'buyQty',
+      key: 'buyQty',
+    },
+    {
+      title: 'Sell Avg',
+      dataIndex: 'sellAvg',
+      key: 'sellAvg',
+    },
+    {
+      title: 'Sell Qty',
+      dataIndex: 'sellQty',
+      key: 'sellQty',
+    },
+    {
+      title: 'Net Qty',
+      dataIndex: 'netQty',
+      key: 'netQty',
+    },
+    {
+      title: 'Realized Profit',
+      dataIndex: 'realizedProfit',
+      key: 'realizedProfit',
+    },
+    {
+      title: 'Unrealized Profit',
+      dataIndex: 'unrealizedProfit',
+      key: 'unrealizedProfit',
+    }
+  ];
+
+  const data = [
+    {
+    "dhanClientId": "1000000009",    
+    "tradingSymbol": "TCS",
+    "securityId": "11536",
+    "positionType": "LONG",
+    "exchangeSegment": "NSE_EQ", 
+    "productType": "CNC",
+    "buyAvg": 3345.8,
+    "buyQty": 40,
+    "costPrice": 3215.0,
+    "sellAvg": 0.0,
+    "sellQty": 0,
+    "netQty": 40,
+    "realizedProfit": 0.0,
+    "unrealizedProfit": 6122.0,
+    "rbiReferenceRate": 1.0,
+    "multiplier": 1,
+    "carryForwardBuyQty": 0,
+    "carryForwardSellQty": 0,
+    "carryForwardBuyValue": 0.0,
+    "carryForwardSellValue": 0.0,
+    "dayBuyQty": 40,
+    "daySellQty": 0,
+    "dayBuyValue": 133832.0,
+    "daySellValue": 0.0,
+    "drvExpiryDate": "0001-01-01",
+    "drvOptionType": null,
+    "drvStrikePrice": 0.0,
+    "crossCurrency": false
+    } 
+]
+
 
   return (
     <CustomLayout>
@@ -251,10 +393,11 @@ const Journal = () => {
             />
 
             <div className='flex space-x-3'>
+            <Button type='default' shape="circle" onClick={refreshTable} icon={<ReloadOutlined />}/>
               <JournalTypeSelector handleFilterChange={handleFilterChange} />
               <ReviewTypeSelector handleFilterChange={handleFilterChange} />
               <RangePicker
-                defaultValue={[dayjs(),dayjs()]}
+                defaultValue={[dayjs(), dayjs()]}
                 disabledDate={current =>
                   current && current > moment().endOf('day')
                 }
@@ -280,146 +423,175 @@ const Journal = () => {
             onClose={() => {
               setShowSideDrawer(false)
               setSelectedJournal(null)
+              setPostDatas(null)
+              setPreData(null)
             }}
-            width={'50%'}
+            width={'85%'}
             className='dark:bg-gray-900 dark:text-white'
           >
-            <div className='border-b-[0.5px] border-slate-300 mb-3 dark:border-gray-700'>
-              <div className='flex justify-between'>
-                <h1 className='text-xl dark:text-white'>Journal</h1>
-                {selectedJournal?.reviewId ? (
-                  <Tag
-                    color='green'
-                    className='flex items-center dark:bg-green-800'
-                  >
-                    {'Reviewed By ' + selectedJournal?.review.reviewerId}
-                  </Tag>
-                ) : (
-                  <div className='flex flex-col'>
-                    <Button
-                      onClick={() => {
-                        setShowAddReviewDrawer(true)
-                      }}
-                      className='dark:bg-gray-800 dark:text-white'
-                    >
-                      Add Review
-                    </Button>
-                    <span className='text-orange-500'>Review pending </span>
-                  </div>
-                )}
-              </div>
-              {selectedJournal && (
-                <List
-                  dataSource={selectedJournal.responses}
-                  renderItem={(item: any, index: number) => (
-                    <List.Item key={index}>
-                      <List.Item.Meta
-                        title={
-                          <div>
-                            <h1 className='dark:text-white'>Question:</h1>
-                            <h1 className='w-full px-3 py-2 rounded-md border-[0.5px] border-slate-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white'>
-                              {item?.question?.title}
-                            </h1>
-                          </div>
-                        }
-                        description={
-                          <div>
-                            <h1 className='dark:text-white'>Response:</h1>
-                            <h1 className='w-full px-3 py-2 rounded-md border-[0.5px] border-slate-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white'>
-                              {item?.answer}
-                            </h1>
-                          </div>
-                        }
-                      />
-                    </List.Item>
-                  )}
+            <div className=' grid grid-cols-2 grid-rows-2 gap-4 p-4 h-full'>
+              <JournalMarketSection
+                selectedJournal={preData}
+                setShowAddReviewDrawer={setShowAddReviewDrawer}
+                text='Pre Market'
+              />
+              <JournalMarketSection
+                selectedJournal={postDatas}
+                setShowAddReviewDrawer={setShowAddReviewDrawer}
+                text='Post Market'
+              />
+
+              <div className='border p-2 overflow-auto shadow-md dark:bg-gray-900 dark:text-white'>
+                <h2 className='text-xl mb-2'>Profit & Loss</h2>
+                <CustomTable
+                  columns={profitLossColumns}
+                  data={data}
+                  totalDocuments={data.length}
+                  loading={loading}
                 />
-              )}
-            </div>
-
-            <div className='border-b-[0.5px] border-slate-300 pb-3 mb-3 dark:border-gray-700'>
-              <h1 className='text-xl dark:text-white'>Emotions:</h1>
-              <h1 className='w-full text-sm text-gray-400 px-3 py-2 rounded-md bg-slate-100 border-[0.5px] border-slate-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400'>
-                {selectedJournal?.emotion?.value || 'Not recorded'}
-              </h1>
-            </div>
-
-            <div>
-              <div className='border-b-[0.5px] border-slate-300 pb-3 mb-3 dark:border-gray-700'>
-                <h1 className='text-xl mb-2 dark:text-white'>
-                  Uploads by user:
-                </h1>
-                {selectedJournal?.uploads?.length === 0 ? (
-                  <h1 className='dark:text-white'>No Uploads Found</h1>
-                ) : (
-                  <Carousel {...settings}>
-                    {selectedJournal?.uploads?.map(
-                      (upload: any, ind: number) => (
-                        <div
-                          className='border-slate-200 border rounded-md dark:border-gray-700'
-                          key={ind}
-                        >
-                          <img
-                            src={upload.fileUrl}
-                            alt={`Upload ${ind + 1}`}
-                            style={{
-                              width: '100%',
-                              height: 'auto',
-                              maxHeight: '150px',
-                              objectFit: 'contain'
-                            }}
-                          />
-                        </div>
-                      )
-                    )}
-                  </Carousel>
-                )}
               </div>
-
-              <div>
-                <h1 className='text-xl mb-2 dark:text-white'>
-                  Review By Mentor/Admin:
-                </h1>
-                {!selectedJournal?.reviewId ? (
-                  <h1 className='dark:text-white'>No Reviews yet</h1>
-                ) : (
-                  <div>
-                    <h1 className='w-full px-3 py-2 rounded-md bg-slate-100 border-[0.5px] border-slate-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white'>
-                      {selectedJournal?.review?.value}
-                    </h1>
-                    {selectedJournal?.review && (
-                      <div className='flex items-center my-3 space-x-2'>
-                        <Rate
-                          disabled
-                          value={selectedJournal?.review?.rating}
-                        />
-                        <Tag>{selectedJournal?.review?.rating + ' stars'}</Tag>
+              <div className='border p-2 overflow-auto shadow-md dark:bg-gray-900 dark:text-white'>
+                <div className='border-b-[0.5px] border-slate-300 mb-3 dark:border-gray-700'>
+                  <div className='flex justify-between'>
+                    <h1 className='text-xl dark:text-white'>Reviews</h1>
+                    {selectedJournal?.reviewId ? (
+                      <Tag
+                        color='green'
+                        className='flex items-center dark:bg-green-800'
+                      >
+                        {'Reviewed By ' + selectedJournal?.review.reviewerId}
+                      </Tag>
+                    ) : (
+                      <div className='flex flex-col'>
+                        <Button
+                          onClick={() => {
+                            setShowAddReviewDrawer(true)
+                          }}
+                          className='dark:bg-gray-800 dark:text-white'
+                        >
+                          Add Review
+                        </Button>
+                        <span className='text-orange-500'>Review pending </span>
                       </div>
                     )}
                   </div>
+                  {/* {selectedJournal && (
+                    <List
+                      dataSource={selectedJournal.responses}
+                      renderItem={(item: any, index: number) => (
+                        <List.Item key={index}>
+                          <List.Item.Meta
+                            title={
+                              <div>
+                                <h1 className='dark:text-white'>Question:</h1>
+                                <h1 className='w-full px-3 py-2 rounded-md border-[0.5px] border-slate-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white'>
+                                  {item?.question?.title}
+                                </h1>
+                              </div>
+                            }
+                            description={
+                              <div>
+                                <h1 className='dark:text-white'>Response:</h1>
+                                <h1 className='w-full px-3 py-2 rounded-md border-[0.5px] border-slate-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white'>
+                                  {item?.answer}
+                                </h1>
+                              </div>
+                            }
+                          />
+                        </List.Item>
+                      )}
+                    />
+                  )} */}
+                </div>
+
+                <div className='border-b-[0.5px] border-slate-300 pb-3 mb-3 dark:border-gray-700'>
+                  <h1 className='text-xl dark:text-white'>Emotions:</h1>
+                  <h1 className='w-full text-sm text-gray-400 px-3 py-2 rounded-md bg-slate-100 border-[0.5px] border-slate-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400'>
+                    {selectedJournal?.emotion?.value || 'Not recorded'}
+                  </h1>
+                </div>
+
+                <div>
+                  <div className='border-b-[0.5px] border-slate-300 pb-3 mb-3 dark:border-gray-700'>
+                    <h1 className='text-xl mb-2 dark:text-white'>
+                      Uploads by user:
+                    </h1>
+                    {selectedJournal?.uploads?.length === 0 ? (
+                      <h1 className='dark:text-white'>No Uploads Found</h1>
+                    ) : (
+                      <Carousel {...settings}>
+                        {selectedJournal?.uploads?.map(
+                          (upload: any, ind: number) => (
+                            <div
+                              className='border-slate-200 border rounded-md dark:border-gray-700'
+                              key={ind}
+                            >
+                              <img
+                                src={upload.fileUrl}
+                                alt={`Upload ${ind + 1}`}
+                                style={{
+                                  width: '100%',
+                                  height: 'auto',
+                                  maxHeight: '150px',
+                                  objectFit: 'contain'
+                                }}
+                              />
+                            </div>
+                          )
+                        )}
+                      </Carousel>
+                    )}
+                  </div>
+
+                  <div>
+                    <h1 className='text-xl mb-2 dark:text-white'>
+                      Review By Mentor/Admin:
+                    </h1>
+                    {!selectedJournal?.reviewId ? (
+                      <h1 className='dark:text-white'>No Reviews available for {selectedJournal?.type}</h1>
+                    ) : (
+                      <div>
+                        <h1 className='w-full px-3 py-2 rounded-md bg-slate-100 border-[0.5px] border-slate-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white'>
+                          {selectedJournal?.review?.value}
+                        </h1>
+                        {selectedJournal?.review && (
+                          <div className='flex items-center my-3 space-x-2'>
+                            <Rate
+                              disabled
+                              value={selectedJournal?.review?.rating}
+                            />
+                            <Tag>
+                              {selectedJournal?.review?.rating + ' stars'}
+                            </Tag>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {selectedJournal && selectedJournal?.review && (
+                  <div>
+                    <Upload {...uploadProps}>
+                      <Button
+                        icon={<UploadOutlined />}
+                        className='dark:bg-gray-800 dark:text-white'
+                      >
+                        Select Files
+                      </Button>
+                    </Upload>
+                    <Button
+                      onClick={handleUpload}
+                      disabled={fileList.length === 0 || isUploading}
+                      className='dark:bg-gray-800 dark:text-white'
+                    >
+                      {isUploading ? 'Uploading...' : 'Upload'}
+                    </Button>
+                  </div>
                 )}
               </div>
             </div>
 
-            {selectedJournal && selectedJournal?.review && (
-              <div>
-                <Upload {...uploadProps}>
-                  <Button
-                    icon={<UploadOutlined />}
-                    className='dark:bg-gray-800 dark:text-white'
-                  >
-                    Select Files
-                  </Button>
-                </Upload>
-                <Button
-                  onClick={handleUpload}
-                  disabled={fileList.length === 0 || isUploading}
-                  className='dark:bg-gray-800 dark:text-white'
-                >
-                  {isUploading ? 'Uploading...' : 'Upload'}
-                </Button>
-              </div>
-            )}
             <Drawer
               width={'60%'}
               onClose={() => {

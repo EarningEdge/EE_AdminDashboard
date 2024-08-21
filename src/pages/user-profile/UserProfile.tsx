@@ -11,6 +11,7 @@ import BarGraph from "../../components/graphs/bar-graph/NewBar";
 import DonutChart from "../../components/graphs/donut-chart/DonutChart";
 import AreaChart from "../../components/graphs/area-chart/AreaChart";
 import dayjs, { Dayjs } from "dayjs";
+import { useAppSelector } from "../../redux/hooks";
 
 interface RatingResponse {
   status: string;
@@ -132,6 +133,7 @@ const [selectedYear, setSelectedYear] = useState(dayjs().year());
     );
   }, [ratingData]);
 
+  const darkMode = useAppSelector((state) => state?.theme?.darkMode);
 
 
   if (loading) return <p>Loading...</p>;
@@ -139,7 +141,7 @@ const [selectedYear, setSelectedYear] = useState(dayjs().year());
 
   return (
     <CustomLayout>
-      <div className="p-10 bg-slate-50">
+      <div className="p-10 ">
         <ProfileSection user={userData && userData?.data} />
         <Row gutter={16} className="mt-10">
           {dataArray.map((item, index) => (
@@ -153,7 +155,7 @@ const [selectedYear, setSelectedYear] = useState(dayjs().year());
           ))}
         </Row>
         <Flex justify="space-between" className="mt-10">
-          <div className="w-[48%] p-4 h-[350px] flex flex-col border rounded-xl border-slate-200 bg-white">
+          <div className="w-[48%] p-4 h-[350px] flex flex-col border rounded-xl border-slate-200 dark:bg-dark-blue bg-white">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Net P&L</h2>
               <div className="flex items-center space-x-2">
@@ -183,13 +185,13 @@ const [selectedYear, setSelectedYear] = useState(dayjs().year());
                   categories={pnlCategories}
                   title=""
                   colors={["#34D399", "#F87171"]}
-                  darkMode={false}
+                  darkMode={darkMode}
                   type={graphType}
                 />
               </div>
             )}
           </div>
-          <div className="w-[48%] p-4 h-[350px] flex flex-col border rounded-xl border-slate-200 bg-white">
+          <div className="w-[48%] p-4 h-[350px] flex flex-col border rounded-xl border-slate-200 dark:bg-dark-blue bg-white">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Overall Win Percentage</h2>
             </div>
@@ -199,12 +201,13 @@ const [selectedYear, setSelectedYear] = useState(dayjs().year());
                 labels={["Win", "Loss"]}
                 title="Win vs Loss"
                 colors={["#34D399", "#F87171"]}
+                darkMode={darkMode}
               />
             </div>
           </div>
         </Flex>
         <div className="w-full flex flex-col mt-10">
-          <div className="w-[100%] p-4 h-[350px] flex flex-col border rounded-xl border-slate-200 bg-white">
+          <div className="w-[100%] p-4 h-[350px] flex flex-col border rounded-xl border-slate-200 dark:bg-dark-blue bg-white">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">
                 Review Rating Performance
@@ -221,6 +224,7 @@ const [selectedYear, setSelectedYear] = useState(dayjs().year());
               data={ratingsData}
               categories={ratingCategories}
               colors={["#1453ff"]}
+              darkMode={darkMode}
             />
           </div>
         </div>

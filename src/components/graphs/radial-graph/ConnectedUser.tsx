@@ -4,9 +4,10 @@ import { ApexOptions } from 'apexcharts';
 
 interface RadialSemicircleProps {
   value: number;
+  darkMode?: boolean;
 }
 
-const RadialSemicircle: React.FC<RadialSemicircleProps> = ({ value }) => {
+const RadialSemicircle: React.FC<RadialSemicircleProps> = ({ value,darkMode }) => {
   const options: ApexOptions = {
     chart: {
       type: 'radialBar',
@@ -41,6 +42,7 @@ const RadialSemicircle: React.FC<RadialSemicircleProps> = ({ value }) => {
             offsetY: 8,
             fontSize: '40px',
             fontWeight: 600,
+            color: darkMode ? 'white' : 'black',
             formatter: function(val) {
               return val + '%';
             }

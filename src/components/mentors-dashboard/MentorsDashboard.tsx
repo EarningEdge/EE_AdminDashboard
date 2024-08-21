@@ -24,6 +24,8 @@ import { ColumnsType } from "antd/es/table";
 import { useAppSelector } from "../../redux/hooks";
 import CustomTable from "../common/table/CustomTable";
 import avatar from "../../assets/images/avatar.png";
+import { ReloadOutlined } from '@ant-design/icons'
+
 const MentorsDashboard: React.FC = () => {
   const {
     getAllMentors,
@@ -52,6 +54,8 @@ const MentorsDashboard: React.FC = () => {
   } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isTradersLoading, setIsTradersLoading] = useState(false);
+  const [refresh, setRefresh] = useState(false)
+
   const navigate = useNavigate();
 
   const fetchAllMentors = async () => {
@@ -136,11 +140,14 @@ const MentorsDashboard: React.FC = () => {
       setShowRemoveUserModal(false);
     }
   };
+  const refreshTable = ()=>{
+    setRefresh(!refresh)
+  }
 
   useEffect(() => {
     fetchAllMentors();
     fetchAllUnassignedTraders();
-  }, []);
+  }, [refresh]);
   useEffect(() => {
     if (selectedMentor) {
       fetchAllTraders();
@@ -329,6 +336,8 @@ const MentorsDashboard: React.FC = () => {
             <p className="text-light-grey">List of all mentors </p>
           </div>
           <div className="flex space-x-2">
+          <Button type='default' shape="circle" onClick={refreshTable} icon={<ReloadOutlined />}/>
+
             <Button
               onClick={() => {
                 navigate("/admin/create-mentor");

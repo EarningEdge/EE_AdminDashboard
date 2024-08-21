@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { Avatar, ConfigProvider, Dropdown, Layout, Menu } from "antd";
+import { Avatar, ConfigProvider, Dropdown, Layout, Menu,Switch } from "antd";
 import { adminItems, mentorItems } from "../../../utils/menuItems";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { LogoutOutlined, EditOutlined } from "@ant-design/icons";
 import { logout } from "../../../redux/slices/authSlice";
 import EditProfile from "../../modals/edit-profile";
-// import { toggleDarkMode } from "../../../redux/slices/themeSlice";
-// import { SunOutlined, MoonOutlined } from "@ant-design/icons";
+import { toggleDarkMode } from "../../../redux/slices/themeSlice";
+import { SunOutlined, MoonOutlined } from "@ant-design/icons";
 
 const { Header, Sider, Content } = Layout;
 
@@ -120,17 +120,17 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
   const darkMode = useAppSelector((state) => state.theme.darkMode);
 
   return (
-    <Layout
-      style={{ maxHeight: "100vh", minHeight: "100vh", overflow: "hidden" }}
-      className={darkMode ? "dark" : ""}
-    >
+    <Layout style={{ minHeight: "100vh" }}  className={darkMode ? "dark" : ""}>
       <ConfigProvider theme={darkMode ? darkTheme : lightTheme}>
         <Sider
           className="bg-dark-blue"
           style={{
             background: "#262633",
-            boxShadow: "5px 0 5px -2px rgba(0, 0, 0, 0.5)",
-            height:"100%"
+            // boxShadow: "5px 0 5px -2px rgba(0, 0, 0, 0.5)",
+            height: "100vh",
+            position: "fixed",
+            left: 0,
+            // overflowY: "auto",
           }}
         >
           <div className="text-xl text-white text-center mt-4 mb-8 font-bold">
@@ -154,16 +154,15 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
           >
             {renderMenuItems(menuItems)}
           </Menu>
-        </Sider>
-
-        <Layout>
+          </Sider>
+        <Layout style={{ marginLeft: 200 }}>
           <Header className="flex justify-end items-center pr-4 dark:bg-dark-blue bg-white">
-            {/* <Switch
+            <Switch
             checkedChildren={<SunOutlined />}
             unCheckedChildren={<MoonOutlined />}
             checked={darkMode}
             onChange={() => dispatch(toggleDarkMode())}
-          /> */}
+          />
             <Dropdown
               menu={{ items }}
               trigger={["click"]}
@@ -171,15 +170,19 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
             >
               <Avatar size={40} src={user.profile_image_url || "/avatar.png"} />
             </Dropdown>
-          </Header>
+            </Header>
           <Content
-            style={{ overflowY: "scroll" }}
-            className="bg-white dark:bg-dark-blue dark:text-white "
+            style={{ 
+              // height: "calc(100vh - 64px)", 
+              overflowY: "hidden",
+              display: "flex",
+              flexDirection: "column",
+            }}
+            className="bg-white dark:bg-dark-blue dark:text-white"
           >
-            <div style={{ minHeight: 360 }}>{children}</div>
+            {children}
           </Content>
         </Layout>
-
         <EditProfile
           isModalOpen={isModalOpen}
           handleOk={handleOk}
