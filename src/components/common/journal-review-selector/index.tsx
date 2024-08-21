@@ -1,43 +1,46 @@
-import { Segmented } from 'antd'
+import { Button, Dropdown, Menu, MenuProps } from "antd";
+
+type MenuItem = Required<MenuProps>["items"][number];
+const menuItems: MenuItem[] = [
+  {
+    key: "all",
+    label: "All",
+  },
+  {
+    key: "reviewed",
+    label: "Reviewed",
+  },
+  {
+    key: "pending",
+    label: "Pending",
+  },
+];
 
 
-export const ReviewTypeSelector = ({handleFilterChange}:{handleFilterChange:any}) => {
+export const ReviewTypeSelector = ({
+  handleFilterChange,
+}: {
+  handleFilterChange: (key: string, value: string) => void;
+}) => {
+  const handleDropdownSelect: MenuProps["onClick"] = ({ key }) => {
+    handleFilterChange("reviewStatus", key);
+  };
   return (
-    <Segmented<string>
-    options={[
-      {
-        label: (
-          <span className="flex items-center">
-            {/* <span className="w-2 h-2 bg-slate-600 rounded-full mr-2"></span> */}
-            All
-          </span>
-        ),
-        value: 'All',
-      },
-      {
-        label: (
-          <span className="flex items-center">
-            {/* <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span> */}
-            Reviewed
-          </span>
-        ),
-        value: 'reviewed',
-      },
-      {
-        label: (
-          <span className="flex items-center">
-            {/* <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span> */}
-            Pending
-          </span>
-        ),
-        value: 'pending',
-      },
-    ]}
-    onChange={(value) =>
-      handleFilterChange("reviewStatus", value.toLowerCase())
-    }
-    className='dark:bg-gray-600 dark:text-black'
-  />
-  )
-}
-
+    <>
+      <Dropdown
+        overlay={
+          <Menu
+            items={menuItems}
+            selectable
+            defaultSelectedKeys={["all"]}
+            onClick={handleDropdownSelect}
+          />
+        }
+        placement="bottomRight"
+        arrow
+      >
+        <Button>Journal Status</Button>
+      </Dropdown>
+    </>
+  );
+};

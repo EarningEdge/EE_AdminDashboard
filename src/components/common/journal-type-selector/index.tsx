@@ -1,43 +1,52 @@
-import { Segmented } from 'antd'
+import {
+  Button,
+  Dropdown,
+  Menu,
+  MenuProps,
+} from "antd";
 
+type MenuItem = Required<MenuProps>["items"][number];
 
-export const JournalTypeSelector = ({handleFilterChange}:{handleFilterChange:any}) => {
+const menuItems: MenuItem[] = [
+  {
+    key: "all",
+    label: "All",
+  },
+  {
+    key: "entry",
+    label: "Entry",
+  },
+  {
+    key: "exit",
+    label: "Exit",
+  },
+];
+
+export const JournalTypeSelector = ({
+  handleFilterChange,
+}: {
+  handleFilterChange: (key: string, value: string) => void;
+}) => {
+  const handleDropdownSelect: MenuProps["onClick"] = ({ key }) => {
+    handleFilterChange("journalType", key);
+  };
+
   return (
-    <Segmented<string>
-    options={[
-      {
-        label: (
-          <span className="flex items-center">
-            <span className="w-2 h-2 bg-slate-600 rounded-full mr-2"></span>
-            All
-          </span>
-        ),
-        value: 'All',
-      },
-      {
-        label: (
-          <span className="flex items-center">
-            <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-            Entry
-          </span>
-        ),
-        value: 'Entry',
-      },
-      {
-        label: (
-          <span className="flex items-center">
-            <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-            Exit
-          </span>
-        ),
-        value: 'Exit',
-      },
-    ]}
-    onChange={(value) =>
-      handleFilterChange("journalType", value.toLowerCase())
-    }
-    className='dark:bg-gray-600 dark:text-black'
-  />
-  )
-}
-
+    <>
+      <Dropdown
+        overlay={
+          <Menu
+            items={menuItems}
+            selectable
+            defaultSelectedKeys={["all"]}
+            onClick={handleDropdownSelect}
+          />
+        }
+        placement="bottomRight"
+        arrow
+      >
+        <Button>Journal Type</Button>
+      </Dropdown>
+    </>
+  );
+};
