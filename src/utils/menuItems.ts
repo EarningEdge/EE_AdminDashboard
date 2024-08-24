@@ -1,6 +1,6 @@
 import React from "react";
 
-import {HomeFilled,BookFilled,QuestionCircleFilled,TeamOutlined, UserOutlined,LineChartOutlined,SettingOutlined, GlobalOutlined, BookOutlined, BellOutlined} from "@ant-design/icons"
+import {HomeFilled,BookFilled,QuestionCircleFilled,TeamOutlined, UserOutlined,LineChartOutlined, GlobalOutlined, BookOutlined, BellOutlined} from "@ant-design/icons"
 
 export const adminItems = [
   {
@@ -26,13 +26,7 @@ export const adminItems = [
     icon: React.createElement(QuestionCircleFilled),
     label: "Questions",
     path: "/admin/questions",
-    children: [
-      {
-        key: "5",
-        label: 'Manage Questions',
-        path:"/admin/questions",
-        icon: React.createElement(SettingOutlined)
-      },
+    
       // {
       //   key: "6",
       //   label: 'Analytics',
@@ -40,7 +34,7 @@ export const adminItems = [
       //   icon: React.createElement(LineChartOutlined),
       // },
       
-    ],
+
   },
   {
     key: "7",
@@ -65,16 +59,14 @@ export const adminItems = [
     icon: React.createElement(LineChartOutlined),
     label: "BD Users",
     path: "/admin/sales",
-
-    children: [
-      {
-        key: "11",
-        label: 'Manage Alerts',
-        path:"/admin/alerts",
-        icon: React.createElement(BellOutlined)
-      },
-    ]
   },
+  {
+    key: "11",
+    icon: React.createElement(BellOutlined),
+    label: "Alerts",
+    path: "/admin/alerts",
+  }
+    
 ];
 
 

@@ -93,6 +93,23 @@ const Journal = () => {
   const [refresh, setRefresh] = useState(false)
   const [fileList, setFileList] = useState<any[]>([])
   const { RangePicker } = DatePicker
+  const [positions, setPositions] = useState([]);
+  // const [positionsLoading, setPositionsLoading] = useState(false);
+  const fetchPositions = async () => {
+    if (!selectedJournal?.userId?._id) return;
+    // setPositionsLoading(true);
+    try {
+      const response = await fetch(`/api/getPositionsAdmin/${selectedJournal.userId._id}`);
+      if (!response.ok) throw new Error('Failed to fetch positions');
+      const data = await response.json();
+      setPositions(data.data);
+    } catch (error) {
+      console.error('Error fetching positions:', error);
+      message.error('Failed to fetch positions');
+    } finally {
+      // setPositionsLoading(false);
+    }
+  };
 
   const [filters, setFilters] = useState({
     searchTerm: '',
@@ -125,6 +142,8 @@ const Journal = () => {
 
   useEffect(() => {
     fetchData()
+    fetchPositions();
+
   }, [filters,refresh ])
   const handleFilterChange = (filterName: string, value: string | string[]) => {
     setFilters(prevFilters => ({
@@ -187,6 +206,7 @@ const Journal = () => {
     }
 
     setShowSideDrawer(true)
+    fetchPositions()
   }
 
   const uploadProps = {
@@ -283,11 +303,11 @@ const Journal = () => {
   console.log(preData, 'preData')
   console.log(postDatas, 'postDatas')
   const profitLossColumns = [
-    {
-      title: 'Client ID',
-      dataIndex: 'dhanClientId',
-      key: 'dhanClientId',
-    },
+    // {
+    //   title: 'Client ID',
+    //   dataIndex: 'dhanClientId',
+    //   key: 'dhanClientId',
+    // },
     {
       title: 'Trading Symbol',
       dataIndex: 'tradingSymbol',
@@ -298,16 +318,16 @@ const Journal = () => {
       dataIndex: 'positionType',
       key: 'positionType',
     },
-    {
-      title: 'Exchange Segment',
-      dataIndex: 'exchangeSegment',
-      key: 'exchangeSegment',
-    },
-    {
-      title: 'Product Type',
-      dataIndex: 'productType',
-      key: 'productType',
-    },
+    // {
+    //   title: 'Exchange Segment',
+    //   dataIndex: 'exchangeSegment',
+    //   key: 'exchangeSegment',
+    // },
+    // {
+    //   title: 'Product Type',
+    //   dataIndex: 'productType',
+    //   key: 'productType',
+    // },
     {
       title: 'Buy Avg',
       dataIndex: 'buyAvg',
@@ -345,38 +365,7 @@ const Journal = () => {
     }
   ];
 
-  const data = [
-    {
-    "dhanClientId": "1000000009",    
-    "tradingSymbol": "TCS",
-    "securityId": "11536",
-    "positionType": "LONG",
-    "exchangeSegment": "NSE_EQ", 
-    "productType": "CNC",
-    "buyAvg": 3345.8,
-    "buyQty": 40,
-    "costPrice": 3215.0,
-    "sellAvg": 0.0,
-    "sellQty": 0,
-    "netQty": 40,
-    "realizedProfit": 0.0,
-    "unrealizedProfit": 6122.0,
-    "rbiReferenceRate": 1.0,
-    "multiplier": 1,
-    "carryForwardBuyQty": 0,
-    "carryForwardSellQty": 0,
-    "carryForwardBuyValue": 0.0,
-    "carryForwardSellValue": 0.0,
-    "dayBuyQty": 40,
-    "daySellQty": 0,
-    "dayBuyValue": 133832.0,
-    "daySellValue": 0.0,
-    "drvExpiryDate": "0001-01-01",
-    "drvOptionType": null,
-    "drvStrikePrice": 0.0,
-    "crossCurrency": false
-    } 
-]
+
 
 
   return (
@@ -445,8 +434,8 @@ const Journal = () => {
                 <h2 className='text-xl mb-2'>Profit & Loss</h2>
                 <CustomTable
                   columns={profitLossColumns}
-                  data={data}
-                  totalDocuments={data.length}
+                  data={positions}
+                  totalDocuments={positions.length}
                   loading={loading}
                 />
               </div>

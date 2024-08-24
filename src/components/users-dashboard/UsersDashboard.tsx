@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Input, Tag } from "antd";
+import { Button, Input, message, Tag } from "antd";
 // import { CloudDownloadOutlined } from '@ant-design/icons'
 
 
@@ -15,7 +15,7 @@ import useBDUserService from "../../hooks/useBDUserService";
 
 const UsersDashboard: React.FC = () => {
   const { getAllUsers } = useUserService();
-  const { toggleBDUser } = useBDUserService();
+  const { toggleOrAssignBDUser } = useBDUserService();
   const user = useAppSelector((state) => state.auth.user);
   const [users, setUsers] = useState<IUser[]>([]);
   const [originalUsers, setOriginalUsers] = useState<IUser[]>([]);
@@ -67,18 +67,15 @@ const UsersDashboard: React.FC = () => {
   }, [searchTerm]);
 
 
-  const assignBD = () => {
-
-  };
 
   const onToggle = async(userId: string) => {
     try {
-      const res = await toggleBDUser(userId)
+      const res = await toggleOrAssignBDUser(userId)
       if(res.status===200){
-        
+        message.success("Done")
       }
-    } catch (error) {
-      
+    } catch (error:any) {
+      message.error(error.message)
     }
   };
 
@@ -159,14 +156,13 @@ const UsersDashboard: React.FC = () => {
     {
       title: "Toggle BD Status",
       key: "togglebd",
-      render: (_, record) => {
-        return record.referralCode === null ? (
-          <Switch defaultChecked={false} onChange={assignBD} />
-        ) : (
-          <Switch value={record.isBD} onChange={()=>{onToggle(String(record._id))}} />
-        );
-      },
-    },
+      render: (_, record) => (
+        <Switch
+          checked={record.isBD}
+          onChange={() => onToggle(String(record._id))}
+        />
+      ),
+    }
   ];
   // const refreshTable = ()=>{
   //   setRefresh(!refresh)

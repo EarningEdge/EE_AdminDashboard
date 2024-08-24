@@ -7,9 +7,10 @@ const useBDUserService = () => {
   const getSalesData = async () => {
     return await api.get("/sales/data/");
   };
-  const toggleBDUser = async (userId:string) => {
-    return await api.put(`/sales/toggle/${userId}/`);
+  const toggleOrAssignBDUser = async (userId:string) => {
+    return await api.put(`/sales/toggle-assign/${userId}/`);
   };
-  return { getAllUsers, getSalesData, toggleBDUser };
+  
+  return { getAllUsers, getSalesData, toggleOrAssignBDUser };
 };
 export default useBDUserService;

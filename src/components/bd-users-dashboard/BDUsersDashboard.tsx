@@ -11,7 +11,7 @@ import CustomTable from "../common/table/CustomTable";
 // import { useAppSelector } from "../../redux/hooks";
 
 const BDUsersDashboard: React.FC = () => {
-  const { getAllUsers, getSalesData, toggleBDUser } = useBDUserService();
+  const { getAllUsers, getSalesData, toggleOrAssignBDUser } = useBDUserService();
   // const user = useAppSelector((state) => state.auth.user);
   const [users, setUsers] = useState<IUser[]>([]);
   const [originalUsers, setOriginalUsers] = useState<IUser[]>([]);
@@ -76,17 +76,22 @@ const BDUsersDashboard: React.FC = () => {
     }
   }, [searchTerm]);
 
-  const onToggle = async(userId: string) => {
+  const onToggle = async (userId: string) => {
     try {
-      
-      const res = await toggleBDUser(userId)
-      if(res.status===200){
-  
+      const res = await toggleOrAssignBDUser(userId);
+      if (res.status === 200) {
+        // Update the local state to reflect the change
+        setUsers(prevUsers =>
+          prevUsers.map(user =>
+            user._id === userId ? { ...user, isBD: !user.isBD } : user
+          )
+        );
       }
     } catch (error) {
-      
+      console.error("Error toggling BD status:", error);
+      // Handle error (e.g., show a notification)
     }
-  }
+  };
 
   const getUserCount = (userId: string) => {
     // Call API
@@ -158,10 +163,13 @@ const BDUsersDashboard: React.FC = () => {
     {
       title: "Toggle BD Status",
       key: "togglebd",
-      render: (_, record) =>(
-        <Switch value={record.isBD} onChange={()=>{onToggle(String(record._id))}} />
-      )
-    },
+      render: (_, record) => (
+        <Switch
+          checked={record.isBD}
+          onChange={() => onToggle(String(record._id))}
+        />
+      ),
+    }
   ];
 
   return (
