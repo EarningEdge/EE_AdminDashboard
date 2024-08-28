@@ -1,13 +1,24 @@
-import React, { useState } from "react";
-import { Avatar, ConfigProvider, Dropdown, Layout, Menu,Switch } from "antd";
+import React, { useEffect, useState } from "react";
+import {
+  Avatar,
+  Badge,
+  ConfigProvider,
+  Drawer,
+  Dropdown,
+  Layout,
+  Menu,
+  Segmented,
+  Switch,
+} from "antd";
 import { adminItems, mentorItems } from "../../../utils/menuItems";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { LogoutOutlined, EditOutlined } from "@ant-design/icons";
+import { LogoutOutlined, EditOutlined, BellOutlined } from "@ant-design/icons";
 import { logout } from "../../../redux/slices/authSlice";
 import EditProfile from "../../modals/edit-profile";
 import { toggleDarkMode } from "../../../redux/slices/themeSlice";
 import { SunOutlined, MoonOutlined } from "@ant-design/icons";
+import useNotificationService from "../../../hooks/useNotification";
 
 const { Header, Sider, Content } = Layout;
 
@@ -44,6 +55,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const menuItems = user?.role === "admin" ? adminItems : mentorItems;
+  const { getNotifications } = useNotificationService();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -119,8 +131,39 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
 
   const darkMode = useAppSelector((state) => state.theme.darkMode);
 
+  const [open, setOpen] = useState(false);
+
+  const showDrawer = () => {
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
+
+  const [notifications, setNotifications] = useState([]);
+
+  const fetchNotifications = async (value: boolean) => {
+    const response = await getNotifications(value);
+    if (response.data.status === "success") {
+      const fetchedNotifications = response.data.data.map((q: any) => ({
+        key: q._id,
+        title: q.title,
+        description: q.description,
+        mentor_receipt: q.mentor_receipt,
+        created: new Date(q.createdAt).toDateString(),
+      }));
+      setNotifications(fetchedNotifications);
+      console.log(notifications);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications(false);
+  }, []);
+
   return (
-    <Layout style={{ minHeight: "100vh" }}  className={darkMode ? "dark" : ""}>
+    <Layout style={{ minHeight: "100vh" }} className={darkMode ? "dark" : ""}>
       <ConfigProvider theme={darkMode ? darkTheme : lightTheme}>
         <Sider
           className="bg-dark-blue"
@@ -137,7 +180,6 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
             EarningEdge<span className="text-[#637CFF]">.in</span>
           </div>
           <Menu
-            
             theme="dark"
             mode="inline"
             selectedKeys={[location.pathname]}
@@ -150,19 +192,39 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
               );
               if (item) handleMenuClick(item);
             }}
-            style={{ background: "#262633",minHeight:"100vh" }}
+            style={{ background: "#262633", minHeight: "100vh" }}
           >
             {renderMenuItems(menuItems)}
           </Menu>
-          </Sider>
+        </Sider>
         <Layout style={{ marginLeft: 200 }}>
-          <Header className="flex justify-end items-center pr-4 dark:bg-dark-blue bg-white">
+          <Header className="flex gap-2 justify-end items-center pr-4 dark:bg-dark-blue bg-white">
+            <Badge count={notifications.length} className="mr-3">
+              <BellOutlined className="text-2xl" onClick={showDrawer} />
+            </Badge>
+            <Drawer title="Notifications" onClose={onClose} open={open}>
+              <Segmented<string>
+                options={["Unread", "Read"]}
+                onChange={(value) => {
+                  fetchNotifications(value === "Read" ? true : false);
+                  console.log(value); // string
+                }}
+                block
+                defaultValue="Unread"
+              />
+              {notifications.map((n: { title: string; created: string }) => (
+                <div className="p-3 border-2 rounded-lg shadow-md my-2">
+                  <p className="text-lg font-semibold">{n.title}</p>
+                  <p className="">{n.created}</p>
+                </div>
+              ))}
+            </Drawer>
             <Switch
-            checkedChildren={<SunOutlined />}
-            unCheckedChildren={<MoonOutlined />}
-            checked={darkMode}
-            onChange={() => dispatch(toggleDarkMode())}
-          />
+              checkedChildren={<SunOutlined />}
+              unCheckedChildren={<MoonOutlined />}
+              checked={darkMode}
+              onChange={() => dispatch(toggleDarkMode())}
+            />
             <Dropdown
               menu={{ items }}
               trigger={["click"]}
@@ -170,10 +232,10 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
             >
               <Avatar size={40} src={user.profile_image_url || "/avatar.png"} />
             </Dropdown>
-            </Header>
+          </Header>
           <Content
-            style={{ 
-              // height: "calc(100vh - 64px)", 
+            style={{
+              // height: "calc(100vh - 64px)",
               overflowY: "hidden",
               display: "flex",
               flexDirection: "column",
