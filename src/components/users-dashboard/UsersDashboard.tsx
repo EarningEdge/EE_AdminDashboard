@@ -153,16 +153,16 @@ const UsersDashboard: React.FC = () => {
         </Button>
       ),
     },
-    {
-      title: "Toggle BD Status",
-      key: "togglebd",
-      render: (_, record) => (
-        <Switch
-          checked={record.isBD}
-          onChange={() => onToggle(String(record._id))}
-        />
-      ),
-    }
+    // {
+    //   title: "Toggle BD Status",
+    //   key: "togglebd",
+    //   render: (_, record) => (
+    //     <Switch
+    //       checked={record.isBD}
+    //       onChange={() => onToggle(String(record._id))}
+    //     />
+    //   ),
+    // }
   ];
   // const refreshTable = ()=>{
   //   setRefresh(!refresh)
