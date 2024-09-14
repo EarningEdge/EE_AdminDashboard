@@ -429,7 +429,7 @@ const Journal = () => {
                 setShowAddReviewDrawer={setShowAddReviewDrawer}
                 text='Post Market'
               />
-
+              
               <div className='border p-2 overflow-auto shadow-md dark:bg-gray-900 dark:text-white'>
                 <h2 className='text-xl mb-2'>Profit & Loss</h2>
                 <CustomTable
