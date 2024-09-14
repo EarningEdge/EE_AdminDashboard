@@ -212,12 +212,17 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
                 block
                 defaultValue="Unread"
               />
-              {notifications.map((n: { title: string; created: string }) => (
+              {
+              notifications.length<0?
+              notifications.map((n: { title: string; created: string }) => (
                 <div className="p-3 border-2 rounded-lg shadow-md my-2">
                   <p className="text-lg font-semibold">{n.title}</p>
                   <p className="">{n.created}</p>
                 </div>
-              ))}
+              ))
+              :
+              <p className="text-center">No messages.</p>
+              }
             </Drawer>
             <Switch
               checkedChildren={<SunOutlined />}
