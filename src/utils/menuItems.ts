@@ -1,6 +1,6 @@
 import React from "react";
 
-import {HomeFilled,BookFilled,QuestionCircleFilled,TeamOutlined, UserOutlined,LineChartOutlined, GlobalOutlined, BookOutlined, BellOutlined} from "@ant-design/icons"
+import {HomeFilled,BookFilled,QuestionCircleFilled,TeamOutlined, UserOutlined,LineChartOutlined, GlobalOutlined, BookOutlined, BellOutlined, PlayCircleOutlined} from "@ant-design/icons"
 
 export const adminItems = [
   {
@@ -65,7 +65,15 @@ export const adminItems = [
     icon: React.createElement(BellOutlined),
     label: "Alerts",
     path: "/admin/alerts",
-  }
+  },
+  
+  {
+    key: "12",
+    icon: React.createElement(PlayCircleOutlined),
+    label: "Course",
+    path: "/admin/courses",
+  },
+
     
 ];
 

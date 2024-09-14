@@ -27,6 +27,7 @@ const AllBDUSers = lazy((): any => import("../pages/all-bd-users/AllBDUsers"));
 const BDUserProfile = lazy((): any => import("../pages/bd-user-profile/BDUserProfile"));
 
 const AlertPage = lazy((): any => import("../pages/alerts/Alerts"));
+const CoursePage = lazy((): any => import("../pages/courses"));
 
 
 const router = createBrowserRouter([
@@ -71,6 +72,7 @@ const router = createBrowserRouter([
           { path: "sales/:userId", element: <BDUserProfile /> },
 
           { path: "alerts", element: <AlertPage /> },
+          { path: "courses", element: <CoursePage /> },
 
         ],
       },

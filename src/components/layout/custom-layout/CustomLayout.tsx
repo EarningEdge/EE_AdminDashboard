@@ -144,17 +144,20 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
 
   const fetchNotifications = async (value: boolean) => {
-    const response = await getNotifications(value);
-    if (response.data.status === "success") {
-      const fetchedNotifications = response.data.data.map((q: any) => ({
-        key: q._id,
-        title: q.title,
-        description: q.description,
-        mentor_receipt: q.mentor_receipt,
-        created: new Date(q.createdAt).toDateString(),
-      }));
-      setNotifications(fetchedNotifications);
-      console.log(notifications);
+    try {
+      const response = await getNotifications(value);
+      if (response && response.data && response.data.status === "success") {
+        const fetchedNotifications = response?.data?.data?.map((q: any) => ({
+          key: q._id,
+          title: q.title,
+          description: q.description,
+          mentor_receipt: q.mentor_receipt,
+          created: new Date(q.createdAt).toDateString(),
+        }));
+        setNotifications(fetchedNotifications);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
