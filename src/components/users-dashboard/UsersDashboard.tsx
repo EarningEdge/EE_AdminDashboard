@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { Button, Input, message, Tag } from "antd";
+import { Button, Input, Tag } from "antd";
 // import { CloudDownloadOutlined } from '@ant-design/icons'
 
 
 import { Flex } from "antd";
-import { Switch } from "antd";
+// import { Switch } from "antd";
 import useUserService from "../../hooks/useUserService";
 import { IUser } from "../../types/data";
 import { ColumnsType } from "antd/es/table";
 import CustomTable from "../common/table/CustomTable";
 import { useAppSelector } from "../../redux/hooks";
-import useBDUserService from "../../hooks/useBDUserService";
+// import useBDUserService from "../../hooks/useBDUserService";
 
 
 const UsersDashboard: React.FC = () => {
   const { getAllUsers } = useUserService();
-  const { toggleOrAssignBDUser } = useBDUserService();
+  // const { toggleOrAssignBDUser } = useBDUserService();
   const user = useAppSelector((state) => state.auth.user);
   const [users, setUsers] = useState<IUser[]>([]);
   const [originalUsers, setOriginalUsers] = useState<IUser[]>([]);
@@ -68,16 +68,16 @@ const UsersDashboard: React.FC = () => {
 
 
 
-  const onToggle = async(userId: string) => {
-    try {
-      const res = await toggleOrAssignBDUser(userId)
-      if(res.status===200){
-        message.success("Done")
-      }
-    } catch (error:any) {
-      message.error(error.message)
-    }
-  };
+  // const onToggle = async(userId: string) => {
+  //   try {
+  //     const res = await toggleOrAssignBDUser(userId)
+  //     if(res.status===200){
+  //       message.success("Done")
+  //     }
+  //   } catch (error:any) {
+  //     message.error(error.message)
+  //   }
+  // };
 
   const columns: ColumnsType<IUser> = [
     {

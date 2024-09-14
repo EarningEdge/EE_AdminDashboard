@@ -32,7 +32,7 @@ const UserSalesModal = () => {
 
   //Fetch Personal data
   const {
-    data: userData,
+    // data: userData,
     loading,
     error,
   } = useFetchData<{ data: any }>(`/user/${userId}`);
