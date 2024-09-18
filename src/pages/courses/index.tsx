@@ -1,11 +1,14 @@
 import { useState } from "react";
 import CustomLayout from "../../components/layout/custom-layout/CustomLayout";
-import { Drawer, Modal, Input, Button, List, Spin, message } from "antd";
+import { Drawer, Modal, Input, Button, List, Spin, message, Typography } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import useFetchData from "../../hooks/useFetchData";
 import usePostData from "../../hooks/usePostData";
 import useUpdateData from "../../hooks/useUpdateData";
 import useAxios from "../../hooks/useAxios";
+import { Link } from "react-router-dom";
+
+const { Title } = Typography;
 
 const PlaylistPage = () => {
     const api = useAxios();
@@ -66,28 +69,40 @@ const PlaylistPage = () => {
     // UI rendering
     return (
         <CustomLayout>
-            <section>
+            <section style={{ padding: '20px' }}>
+                <Title level={2} style={{ marginBottom: '20px' }}>Playlists</Title>
                 <Button
                     type="primary"
                     icon={<PlusCircleOutlined />}
                     onClick={() => setCreatePlaylistDrawer(true)}
-                    style={{ marginBottom: 20 }}
+                    style={{ marginBottom: '20px' }}
                 >
                     Create Playlist
                 </Button>
 
                 {/* Playlist List */}
                 {loading ? (
-                    <Spin />
+                    <Spin size="large" tip="Loading playlists..." style={{ display: 'block', margin: '20px auto' }} />
                 ) : fetchError ? (
-                    <p>Error fetching playlists</p>
-                ) : playlists ? (
+                    <p style={{ color: 'red' }}>Error fetching playlists</p>
+                    //@ts-ignore
+                ) : playlists && playlists.data?.length > 0 ? (
                     <List
+                        itemLayout="horizontal"
                         //@ts-ignore
                         dataSource={playlists.data}
                         renderItem={(playlist: any) => (
                             <List.Item
                                 actions={[
+                                    <Link
+                                        to={`/admin/courses/playlist/${playlist.playlist._id}`}
+                                        onClick={() => {
+                                            setCurrentPlaylist(playlist.playlist);
+                                            setUpdatePlaylistDrawer(true);
+                                        }}
+                                    >
+                                        View
+                                    </Link>,
                                     <Button
                                         type="link"
                                         onClick={() => {
@@ -109,11 +124,16 @@ const PlaylistPage = () => {
                                     </Button>,
                                 ]}
                             >
-                                {playlist.playlist.title} - {playlist.videoCount} Videos
+                                <List.Item.Meta
+                                    title={playlist.playlist.title}
+                                    description={`${playlist.videoCount} Videos`}
+                                />
                             </List.Item>
                         )}
                     />
-                ) : null}
+                ) : (
+                    <p>No playlists available</p>
+                )}
 
                 {/* Create Playlist Drawer */}
                 <Drawer
@@ -121,14 +141,15 @@ const PlaylistPage = () => {
                     placement="right"
                     onClose={() => setCreatePlaylistDrawer(false)}
                     open={createPlaylistDrawer}
+                    width={400}
                 >
                     <Input
-                        placeholder="Playlist Title"
+                        placeholder="Enter playlist title"
                         value={newPlaylistTitle}
                         onChange={(e) => setNewPlaylistTitle(e.target.value)}
-                        style={{ marginBottom: 20 }}
+                        style={{ marginBottom: '20px' }}
                     />
-                    <Button type="primary" onClick={handleCreatePlaylist}>
+                    <Button type="primary" onClick={handleCreatePlaylist} style={{ width: '100%' }}>
                         Create
                     </Button>
                 </Drawer>
@@ -139,14 +160,15 @@ const PlaylistPage = () => {
                     placement="right"
                     onClose={() => setUpdatePlaylistDrawer(false)}
                     open={updatePlaylistDrawer}
+                    width={400}
                 >
                     <Input
-                        placeholder="New Playlist Title"
+                        placeholder="Enter new playlist title"
                         value={newPlaylistTitle}
                         onChange={(e) => setNewPlaylistTitle(e.target.value)}
-                        style={{ marginBottom: 20 }}
+                        style={{ marginBottom: '20px' }}
                     />
-                    <Button type="primary" onClick={handleUpdatePlaylist}>
+                    <Button type="primary" onClick={handleUpdatePlaylist} style={{ width: '100%' }}>
                         Rename
                     </Button>
                 </Drawer>
@@ -157,6 +179,8 @@ const PlaylistPage = () => {
                     open={deletePlaylistModal}
                     onCancel={() => setDeletePlaylistModal(false)}
                     onOk={handleDeletePlaylist}
+                    okText="Delete"
+                    cancelText="Cancel"
                 >
                     <p>Are you sure you want to delete this playlist?</p>
                 </Modal>
