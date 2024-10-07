@@ -1,29 +1,30 @@
 import React from "react";
 
 import {HomeFilled,BookFilled,QuestionCircleFilled,TeamOutlined, UserOutlined,LineChartOutlined, GlobalOutlined, BookOutlined, BellOutlined, PlayCircleOutlined} from "@ant-design/icons"
+import { AlertCircle, Book, ChartArea, HomeIcon, MessageCircleQuestion, Play, User, Users2Icon } from "lucide-react"
 
 export const adminItems = [
   {
     key: "1",
-    icon: React.createElement(HomeFilled),
+    icon: React.createElement(HomeIcon),
     label: "Dashboard",
     path: "/admin/",
   },
   {
     key: "2",
-    icon: React.createElement(TeamOutlined),
+    icon: React.createElement(Users2Icon),
     label: "Users",
     path: "/admin/users",
   },
   {
     key: "3",
-    icon: React.createElement(UserOutlined),
+    icon: React.createElement(User),
     label: "Mentors",
     path: "/admin/mentors",
   },
   {
     key: "4",
-    icon: React.createElement(QuestionCircleFilled),
+    icon: React.createElement(MessageCircleQuestion),
     label: "Questions",
     path: "/admin/questions",
     
@@ -38,19 +39,19 @@ export const adminItems = [
   },
   {
     key: "7",
-    icon: React.createElement(BookFilled),
+    icon: React.createElement(Book),
     label: "Journal",
     path: "/admin/journals",
   },
-  {
-    key: "8",
-    icon: React.createElement(GlobalOutlined),
-    label: "Commmunity",
-    path: "/admin/community",
-  },
+  // {
+  //   key: "8",
+  //   icon: React.createElement(GlobalOutlined),
+  //   label: "Commmunity",
+  //   path: "/admin/community",
+  // },
   {
     key: "9",
-    icon: React.createElement(LineChartOutlined),
+    icon: React.createElement(ChartArea),
     label: "Live Market",
     path: "/admin/live",
   },
@@ -62,14 +63,14 @@ export const adminItems = [
   // },
   {
     key: "11",
-    icon: React.createElement(BellOutlined),
+    icon: React.createElement(AlertCircle),
     label: "Alerts",
     path: "/admin/alerts",
   },
   
   {
     key: "12",
-    icon: React.createElement(PlayCircleOutlined),
+    icon: React.createElement(Play),
     label: "Course",
     path: "/admin/courses",
   },

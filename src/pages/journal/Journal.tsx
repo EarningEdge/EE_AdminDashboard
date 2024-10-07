@@ -416,9 +416,9 @@ const Journal = () => {
               setPreData(null)
             }}
             width={'85%'}
-            className='dark:bg-gray-900 dark:text-white'
+            className='dark:bg-gray-900 dark:text-white '
           >
-            <div className=' grid grid-cols-2 grid-rows-2 gap-4 p-4 h-full'>
+            <div className=' grid grid-cols-2 grid-rows-2 gap-2 h-full '>
               <JournalMarketSection
                 selectedJournal={preData}
                 setShowAddReviewDrawer={setShowAddReviewDrawer}

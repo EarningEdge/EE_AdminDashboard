@@ -85,7 +85,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
         );
       }
       return (
-        <Menu.Item key={item.path} icon={item.icon}>
+        <Menu.Item style={{color:"#000"}} key={item.path} icon={item.icon}>
           <Link to={item.path}>{item.label}</Link>
         </Menu.Item>
       );
@@ -169,9 +169,9 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
     <Layout style={{ minHeight: "100vh" }} className={darkMode ? "dark" : ""}>
       <ConfigProvider theme={darkMode ? darkTheme : lightTheme}>
         <Sider
-          className="bg-dark-blue"
+          className="bg-white"
           style={{
-            background: "#262633",
+            background: "#f8f8f8",
             // boxShadow: "5px 0 5px -2px rgba(0, 0, 0, 0.5)",
             height: "100vh",
             position: "fixed",
@@ -179,7 +179,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
             // overflowY: "auto",
           }}
         >
-          <div className="text-xl text-white text-center mt-4 mb-8 font-bold">
+          <div className="text-xl text-black text-center mt-4 mb-8 font-bold">
             EarningEdge<span className="text-[#637CFF]">.in</span>
           </div>
           <Menu
@@ -195,7 +195,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
               );
               if (item) handleMenuClick(item);
             }}
-            style={{ background: "#262633", minHeight: "100vh" }}
+            style={{ background: "#f8f8f8", minHeight: "100vh" }}
           >
             {renderMenuItems(menuItems)}
           </Menu>
