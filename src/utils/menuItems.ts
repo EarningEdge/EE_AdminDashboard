@@ -1,6 +1,6 @@
 import React from "react";
 
-import {HomeFilled,BookFilled,QuestionCircleFilled,TeamOutlined, UserOutlined,LineChartOutlined, GlobalOutlined, BookOutlined, BellOutlined, PlayCircleOutlined} from "@ant-design/icons"
+
 import { AlertCircle, Book, ChartArea, HomeIcon, MessageCircleQuestion, Play, User, Users2Icon } from "lucide-react"
 
 export const adminItems = [
@@ -80,24 +80,24 @@ export const adminItems = [
 
 
   export const mentorItems = [
-    {
-      key: "1",
-      icon: React.createElement(HomeFilled),
-      label: "Dashboard",
-      path: "/mentor/home",
-    },
-    {
-      key: "2",
-      icon: React.createElement(TeamOutlined),
-      label: "Users",
-      path: "/mentor/users",
-    },
+    // {
+    //   key: "1",
+    //   icon: React.createElement(HomeFilled),
+    //   label: "Dashboard",
+    //   path: "/mentor/home",
+    // },
+    // {
+    //   key: "2",
+    //   icon: React.createElement(TeamOutlined),
+    //   label: "Users",
+    //   path: "/mentor/users",
+    // },
     
-    {
-      key: "3",
-      icon: React.createElement(BookOutlined),
-      label: "Journal",
-      path: "/mentor/journals",
-    },
+    // {
+    //   key: "3",
+    //   icon: React.createElement(BookOutlined),
+    //   label: "Journal",
+    //   path: "/mentor/journals",
+    // },
 
   ];
