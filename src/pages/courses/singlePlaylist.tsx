@@ -180,7 +180,7 @@ const SinglePlaylist: React.FC = () => {
 
   const pollVideoStatus = async (videoId: string) => {
     const maxAttempts = 50;
-    const interval = 5000; // 5 seconds
+    const interval = 5000; 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       const response = await api.get(`/video/${videoId}`);
       if (response.data?.data?.video?.url) {
