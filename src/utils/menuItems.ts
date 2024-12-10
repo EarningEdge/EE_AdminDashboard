@@ -1,7 +1,7 @@
 import React from "react";
 
 
-import { AlertCircle, Book, ChartArea, HomeIcon, MessageCircleQuestion, Play, User, Users2Icon } from "lucide-react"
+import { AlertCircle, Book, ChartArea, HomeIcon, MessageCircleQuestion, Play, User, Users2Icon,Trophy } from "lucide-react"
 
 export const adminItems = [
   {
@@ -73,6 +73,13 @@ export const adminItems = [
     icon: React.createElement(Play),
     label: "Course",
     path: "/admin/courses",
+  },
+
+  {
+    key: "13",
+    icon: React.createElement(Trophy),
+    label: "Competition",
+    path: "/admin/competitions",
   },
 
     

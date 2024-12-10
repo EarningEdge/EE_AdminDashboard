@@ -5,7 +5,7 @@ import * as yup from 'yup';
 import { Input, Form as AntdForm, message } from 'antd';
 import CustomButton from '../../components/ui/button/Button';
 import FormLayout from '../../components/layout/form-layout/FormLayout';
-import FormImg from '../../assets/images/adminlogin.jpg';
+import FormImg from '../../assets/images/logo.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { IUser } from '../../types/data';
 import { useAppDispatch } from '../../redux/hooks';

@@ -29,6 +29,7 @@ const BDUserProfile = lazy((): any => import("../pages/bd-user-profile/BDUserPro
 const AlertPage = lazy((): any => import("../pages/alerts/Alerts"));
 const CoursePage = lazy((): any => import("../pages/courses"));
 const SinglePlaylist = lazy((): any => import("../pages/courses/singlePlaylist"));
+const Competition = lazy((): any => import("../pages/competition"));
 
 
 const router = createBrowserRouter([
@@ -75,7 +76,8 @@ const router = createBrowserRouter([
           { path: "alerts", element: <AlertPage /> },
           { path: "courses", element: <CoursePage /> },
           { path: "courses/playlist/:id", element: <SinglePlaylist /> },
-
+          
+          { path: "competitions", element: <Competition /> },
         ],
       },
       {
