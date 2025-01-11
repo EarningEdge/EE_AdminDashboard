@@ -1,15 +1,8 @@
 import {
   Button,
-  Carousel,
-  CarouselProps,
-  Drawer,
-  // List,
   Tag,
-  Rate,
-  Form as AntdForm,
   Input,
   message,
-  Upload,
   DatePicker,
   ConfigProvider
 } from 'antd'
@@ -21,29 +14,26 @@ import { useAppSelector } from '../../redux/hooks'
 import { Link, Navigate } from 'react-router-dom'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
-import { Controller, SubmitHandler, useForm } from 'react-hook-form'
-import CustomButton from '../../components/ui/button/Button'
-import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
+import { SubmitHandler, useForm } from 'react-hook-form'
+// import { yupResolver } from '@hookform/resolvers/yup'
+// import * as yup from 'yup'
 import usePostData from '../../hooks/usePostData'
-import TextArea from 'antd/es/input/TextArea'
-import { UploadOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import { JournalTypeSelector } from '../../components/common/journal-type-selector'
 import { ReviewTypeSelector } from '../../components/common/journal-review-selector'
-import JournalMarketSection from '../../components/journal-section/JournalMarketSection'
 import { ReloadOutlined } from '@ant-design/icons'
+import JournalDrawer from './JournalDrawer'
 
 interface IFormInput {
   review: string
   rating: number
 }
-const schema = yup
-  .object({
-    review: yup.string().required('Review is required').min(4).max(1000),
-    rating: yup.number().required('Rating is required')
-  })
-  .required()
+// const schema = yup
+//   .object({
+//     review: yup.string().required('Review is required').min(4).max(1000),
+//     rating: yup.number().required('Rating is required')
+//   })
+//   .required()
 
 const lightTheme = {
   token: {
@@ -68,23 +58,6 @@ const darkTheme = {
 }
 const Journal = () => {
   const user = useAppSelector(state => state.auth.user)
-  const {
-    control,
-    handleSubmit,
-    formState: { errors }
-  } = useForm<IFormInput>({
-    resolver: yupResolver(schema)
-  })
-  const settings: CarouselProps = {
-    dots: true,
-    infinite: true,
-    draggable: true,
-    arrows: true,
-    speed: 500,
-    slidesToShow: 1,
-
-    slidesToScroll: 1
-  }
   const [showSideDrawer, setShowSideDrawer] = useState(false)
   const [showAddReviewDrawer, setShowAddReviewDrawer] = useState(false)
   const [selectedJournal, setSelectedJournal] = useState<null | any>(null)
@@ -133,10 +106,8 @@ const Journal = () => {
     // error,
     fetchData
   } = useFetchData<any>(
-    `journal/all/${user.role}?searchTerm=${filters.searchTerm}&type=${
-      filters.journalType
-    }&reviewStatus=${filters.reviewStatus}&fromDate=${
-      filters.dateRange[0]
+    `journal/all/${user.role}?searchTerm=${filters.searchTerm}&type=${filters.journalType
+    }&reviewStatus=${filters.reviewStatus}&fromDate=${filters.dateRange[0]
     }&toDate=${dayjs(filters.dateRange[1]).add(1, 'day').format('YYYY-MM-DD')}`
   )
 
@@ -144,7 +115,7 @@ const Journal = () => {
     fetchData()
     fetchPositions();
 
-  }, [filters,refresh ])
+  }, [filters, refresh])
   const handleFilterChange = (filterName: string, value: string | string[]) => {
     setFilters(prevFilters => ({
       ...prevFilters,
@@ -207,17 +178,6 @@ const Journal = () => {
 
     setShowSideDrawer(true)
     fetchPositions()
-  }
-
-  const uploadProps = {
-    onRemove: (file: any) => {
-      setFileList(fileList.filter(f => f.uid !== file.uid))
-    },
-    beforeUpload: (file: any) => {
-      setFileList([...fileList, file])
-      return false
-    },
-    fileList
   }
 
   const columns = [
@@ -294,7 +254,7 @@ const Journal = () => {
       message.error(error?.message || 'Failed to add')
     }
   }
-  const refreshTable = ()=>{
+  const refreshTable = () => {
     setRefresh(!refresh)
   }
 
@@ -302,71 +262,6 @@ const Journal = () => {
   console.log(selectedJournal, 'selectedJournal')
   console.log(preData, 'preData')
   console.log(postDatas, 'postDatas')
-  const profitLossColumns = [
-    // {
-    //   title: 'Client ID',
-    //   dataIndex: 'dhanClientId',
-    //   key: 'dhanClientId',
-    // },
-    {
-      title: 'Trading Symbol',
-      dataIndex: 'tradingSymbol',
-      key: 'tradingSymbol',
-    },
-    {
-      title: 'Position Type',
-      dataIndex: 'positionType',
-      key: 'positionType',
-    },
-    // {
-    //   title: 'Exchange Segment',
-    //   dataIndex: 'exchangeSegment',
-    //   key: 'exchangeSegment',
-    // },
-    // {
-    //   title: 'Product Type',
-    //   dataIndex: 'productType',
-    //   key: 'productType',
-    // },
-    {
-      title: 'Buy Avg',
-      dataIndex: 'buyAvg',
-      key: 'buyAvg',
-    },
-    {
-      title: 'Buy Qty',
-      dataIndex: 'buyQty',
-      key: 'buyQty',
-    },
-    {
-      title: 'Sell Avg',
-      dataIndex: 'sellAvg',
-      key: 'sellAvg',
-    },
-    {
-      title: 'Sell Qty',
-      dataIndex: 'sellQty',
-      key: 'sellQty',
-    },
-    {
-      title: 'Net Qty',
-      dataIndex: 'netQty',
-      key: 'netQty',
-    },
-    {
-      title: 'Realized Profit',
-      dataIndex: 'realizedProfit',
-      key: 'realizedProfit',
-    },
-    {
-      title: 'Unrealized Profit',
-      dataIndex: 'unrealizedProfit',
-      key: 'unrealizedProfit',
-    }
-  ];
-
-
-
 
   return (
     <CustomLayout>
@@ -382,7 +277,7 @@ const Journal = () => {
             />
 
             <div className='flex space-x-3'>
-            <Button type='default' shape="circle" onClick={refreshTable} icon={<ReloadOutlined />}/>
+              <Button type='default' shape="circle" onClick={refreshTable} icon={<ReloadOutlined />} />
               <JournalTypeSelector handleFilterChange={handleFilterChange} />
               <ReviewTypeSelector handleFilterChange={handleFilterChange} />
               <RangePicker
@@ -406,242 +301,30 @@ const Journal = () => {
               />
             </div>
           </div>
-
-          <Drawer
-            open={showSideDrawer}
-            onClose={() => {
-              setShowSideDrawer(false)
-              setSelectedJournal(null)
-              setPostDatas(null)
-              setPreData(null)
+          <JournalDrawer
+            showSideDrawer={showSideDrawer}
+            setShowSideDrawer={setShowSideDrawer}
+            selectedJournal={selectedJournal}
+            setSelectedJournal={setSelectedJournal}
+            preData={preData}
+            setPreData={setPreData}
+            postDatas={postDatas}
+            setPostDatas={setPostDatas}
+            showAddReviewDrawer={showAddReviewDrawer}
+            setShowAddReviewDrawer={setShowAddReviewDrawer}
+            fileList={fileList}
+            setFileList={setFileList}
+            isUploading={isUploading}
+            handleUpload={handleUpload}
+            loading={loading}
+            positions={positions}
+            form={{
+              ...useForm()
             }}
-            width={'85%'}
-            className='dark:bg-gray-900 dark:text-white '
-          >
-            <div className=' grid grid-cols-2 grid-rows-2 gap-2 h-full '>
-              <JournalMarketSection
-                selectedJournal={preData}
-                setShowAddReviewDrawer={setShowAddReviewDrawer}
-                text='Pre Market'
-              />
-              <JournalMarketSection
-                selectedJournal={postDatas}
-                setShowAddReviewDrawer={setShowAddReviewDrawer}
-                text='Post Market'
-              />
-              
-              <div className='border p-2 overflow-auto shadow-md dark:bg-gray-900 dark:text-white'>
-                <h2 className='text-xl mb-2'>Profit & Loss</h2>
-                <CustomTable
-                  columns={profitLossColumns}
-                  data={positions}
-                  totalDocuments={positions.length}
-                  loading={loading}
-                />
-              </div>
-              <div className='border p-2 overflow-auto shadow-md dark:bg-gray-900 dark:text-white'>
-                <div className='border-b-[0.5px] border-slate-300 mb-3 dark:border-gray-700'>
-                  <div className='flex justify-between'>
-                    <h1 className='text-xl dark:text-white'>Reviews</h1>
-                    {selectedJournal?.reviewId ? (
-                      <Tag
-                        color='green'
-                        className='flex items-center dark:bg-green-800'
-                      >
-                        {'Reviewed By ' + selectedJournal?.review.reviewerId}
-                      </Tag>
-                    ) : (
-                      <div className='flex flex-col'>
-                        <Button
-                          onClick={() => {
-                            setShowAddReviewDrawer(true)
-                          }}
-                          className='dark:bg-gray-800 dark:text-white'
-                        >
-                          Add Review
-                        </Button>
-                        <span className='text-orange-500'>Review pending </span>
-                      </div>
-                    )}
-                  </div>
-                  {/* {selectedJournal && (
-                    <List
-                      dataSource={selectedJournal.responses}
-                      renderItem={(item: any, index: number) => (
-                        <List.Item key={index}>
-                          <List.Item.Meta
-                            title={
-                              <div>
-                                <h1 className='dark:text-white'>Question:</h1>
-                                <h1 className='w-full px-3 py-2 rounded-md border-[0.5px] border-slate-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white'>
-                                  {item?.question?.title}
-                                </h1>
-                              </div>
-                            }
-                            description={
-                              <div>
-                                <h1 className='dark:text-white'>Response:</h1>
-                                <h1 className='w-full px-3 py-2 rounded-md border-[0.5px] border-slate-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white'>
-                                  {item?.answer}
-                                </h1>
-                              </div>
-                            }
-                          />
-                        </List.Item>
-                      )}
-                    />
-                  )} */}
-                </div>
+            isReviewAdding={isReviewAdding}
+            onSubmit={onSubmit}
+          />
 
-                <div className='border-b-[0.5px] border-slate-300 pb-3 mb-3 dark:border-gray-700'>
-                  <h1 className='text-xl dark:text-white'>Emotions:</h1>
-                  <h1 className='w-full text-sm text-gray-400 px-3 py-2 rounded-md bg-slate-100 border-[0.5px] border-slate-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400'>
-                    {selectedJournal?.emotion?.value || 'Not recorded'}
-                  </h1>
-                </div>
-
-                <div>
-                  <div className='border-b-[0.5px] border-slate-300 pb-3 mb-3 dark:border-gray-700'>
-                    <h1 className='text-xl mb-2 dark:text-white'>
-                      Uploads by user:
-                    </h1>
-                    {selectedJournal?.uploads?.length === 0 ? (
-                      <h1 className='dark:text-white'>No Uploads Found</h1>
-                    ) : (
-                      <Carousel {...settings}>
-                        {selectedJournal?.uploads?.map(
-                          (upload: any, ind: number) => (
-                            <div
-                              className='border-slate-200 border rounded-md dark:border-gray-700'
-                              key={ind}
-                            >
-                              <img
-                                src={upload.fileUrl}
-                                alt={`Upload ${ind + 1}`}
-                                style={{
-                                  width: '100%',
-                                  height: 'auto',
-                                  maxHeight: '150px',
-                                  objectFit: 'contain'
-                                }}
-                              />
-                            </div>
-                          )
-                        )}
-                      </Carousel>
-                    )}
-                  </div>
-
-                  <div>
-                    <h1 className='text-xl mb-2 dark:text-white'>
-                      Review By Mentor/Admin:
-                    </h1>
-                    {!selectedJournal?.reviewId ? (
-                      <h1 className='dark:text-white'>No Reviews available for {selectedJournal?.type}</h1>
-                    ) : (
-                      <div>
-                        <h1 className='w-full px-3 py-2 rounded-md bg-slate-100 border-[0.5px] border-slate-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white'>
-                          {selectedJournal?.review?.value}
-                        </h1>
-                        {selectedJournal?.review && (
-                          <div className='flex items-center my-3 space-x-2'>
-                            <Rate
-                              disabled
-                              value={selectedJournal?.review?.rating}
-                            />
-                            <Tag>
-                              {selectedJournal?.review?.rating + ' stars'}
-                            </Tag>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {selectedJournal && selectedJournal?.review && (
-                  <div>
-                    <Upload {...uploadProps}>
-                      <Button
-                        icon={<UploadOutlined />}
-                        className='dark:bg-gray-800 dark:text-white'
-                      >
-                        Select Files
-                      </Button>
-                    </Upload>
-                    <Button
-                      onClick={handleUpload}
-                      disabled={fileList.length === 0 || isUploading}
-                      className='dark:bg-gray-800 dark:text-white'
-                    >
-                      {isUploading ? 'Uploading...' : 'Upload'}
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <Drawer
-              width={'60%'}
-              onClose={() => {
-                setShowAddReviewDrawer(false)
-              }}
-              open={showAddReviewDrawer}
-              className='dark:bg-gray-900 dark:text-white'
-            >
-              <h1 className='text-xl border-b-[0.4px] border-slate-300 pb-2 mb-2 dark:text-white dark:border-gray-700'>
-                Add Review
-              </h1>
-              <AntdForm onFinish={handleSubmit(onSubmit)} layout='vertical'>
-                <AntdForm.Item
-                  label={
-                    <span className='dark:text-white text-base'>Review</span>
-                  }
-                  validateStatus={errors.review ? 'error' : ''}
-                  help={errors.review?.message}
-                >
-                  <Controller
-                    name='review'
-                    control={control}
-                    render={({ field }) => (
-                      <TextArea
-                        {...field}
-                        className='dark:text-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500'
-                      />
-                    )}
-                  />
-                </AntdForm.Item>
-
-                <AntdForm.Item
-                  label={
-                    <span className='dark:text-white text-base'>
-                      Add Rating
-                    </span>
-                  }
-                  validateStatus={errors.rating ? 'error' : ''}
-                  help={errors.rating?.message}
-                >
-                  <Controller
-                    name='rating'
-                    control={control}
-                    render={({ field }) => <Rate {...field} />}
-                  />
-                </AntdForm.Item>
-
-                <AntdForm.Item>
-                  <CustomButton
-                    type='primary'
-                    htmlType='submit'
-                    className='text-xl py-5 bg-dark-teal rounded-md dark:bg-teal-700'
-                    isLoading={isReviewAdding}
-                    disabled={isReviewAdding}
-                  >
-                    {loading ? '' : 'Add Review'}
-                  </CustomButton>
-                </AntdForm.Item>
-              </AntdForm>
-            </Drawer>
-          </Drawer>
         </ConfigProvider>
         <CustomTable
           data={journalData && journalData?.data}

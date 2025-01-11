@@ -1,0 +1,228 @@
+import React, { useState } from 'react';
+import { Button, Drawer, Rate, Form as AntdForm } from 'antd';
+import { Controller, SubmitHandler, UseFormReturn } from 'react-hook-form';
+import TextArea from 'antd/es/input/TextArea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./Tabs";
+import JournalMarketSection from '../../components/journal-section/JournalMarketSection';
+import CustomTable from '../../components/common/table/CustomTable';
+import CustomButton from '../../components/ui/button/Button';
+import { profitLossColumns } from './profitLossColumnsData';
+import { LayoutGrid, LayoutPanelTop } from 'lucide-react';
+import ReviewDrawer from './ReviewDrawer';
+
+interface IFormInput {
+  review: string;
+  rating: number;
+}
+
+interface JournalDrawerProps {
+  showSideDrawer: boolean;
+  setShowSideDrawer: (show: boolean) => void;
+  selectedJournal: any;
+  setSelectedJournal: (journal: any) => void;
+  preData: any;
+  setPreData: (data: any) => void;
+  postDatas: any;
+  setPostDatas: (data: any) => void;
+  showAddReviewDrawer: boolean;
+  setShowAddReviewDrawer: (show: boolean) => void;
+  fileList: any[];
+  setFileList: (files: any[]) => void;
+  isUploading: boolean;
+  handleUpload: () => void;
+  loading: boolean;
+  positions: any[];
+  form: UseFormReturn<IFormInput>;
+  isReviewAdding: boolean;
+  onSubmit: SubmitHandler<IFormInput>;
+}
+
+const JournalDrawer: React.FC<JournalDrawerProps> = ({
+  showSideDrawer,
+  setShowSideDrawer,
+  selectedJournal,
+  setSelectedJournal,
+  preData,
+  setPreData,
+  postDatas,
+  setPostDatas,
+  showAddReviewDrawer,
+  setShowAddReviewDrawer,
+  fileList,
+  setFileList,
+  isUploading,
+  handleUpload,
+  loading,
+  positions,
+  form,
+  isReviewAdding,
+  onSubmit
+}) => {
+  const [isGridView, setIsGridView] = useState(false);
+
+  const switchButton = (
+    <div className="flex  justify-between items-center w-full">
+      <div></div> {/* Empty div to maintain spacing */}
+      <Button
+        onClick={() => setIsGridView(!isGridView)}
+        className="flex items-center gap-2"
+      >
+        {isGridView ? (
+          <div className='flex items-center gap-2'>
+            <LayoutPanelTop className="h-4 w-4" />
+            Switch to Tabs
+          </div>
+        ) : (
+          <div className='flex items-center gap-2'>
+            <LayoutGrid className="h-4 w-4" />
+            Switch to Grid
+          </div>
+        )}
+      </Button>
+    </div>
+  )
+
+  return (
+    <>
+      <Drawer
+        open={showSideDrawer}
+        onClose={() => {
+          setShowSideDrawer(false);
+          setSelectedJournal(null);
+          setPostDatas(null);
+          setPreData(null);
+        }}
+        width={'85%'}
+        title={switchButton}
+      >
+
+        {isGridView ? (
+          <div className='grid grid-cols-2 grid-rows-2 gap-2 h-full'>
+            <JournalMarketSection
+              selectedJournal={preData}
+              setShowAddReviewDrawer={setShowAddReviewDrawer}
+              text='Pre Market'
+            />
+            <JournalMarketSection
+              selectedJournal={postDatas}
+              setShowAddReviewDrawer={setShowAddReviewDrawer}
+              text='Post Market'
+            />
+            <div className='border p-2 overflow-auto shadow-md'>
+              <h2 className='text-xl mb-2'>Profit & Loss</h2>
+              <CustomTable
+                columns={profitLossColumns}
+                data={positions}
+                totalDocuments={positions.length}
+                loading={loading}
+              />
+            </div>
+            <ReviewDrawer
+              selectedJournal={selectedJournal}
+              setShowAddReviewDrawer={setShowAddReviewDrawer}
+              fileList={fileList}
+              setFileList={setFileList}
+              isUploading={isUploading}
+              handleUpload={handleUpload}
+            />
+          </div>
+        ) : (
+          <Tabs defaultValue="pre-market" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="pre-market">Pre Market</TabsTrigger>
+              <TabsTrigger value="post-market">Post Market</TabsTrigger>
+              <TabsTrigger value="profit-loss">Profit & Loss</TabsTrigger>
+              <TabsTrigger value="reviews">Reviews</TabsTrigger>
+            </TabsList>
+            <TabsContent value="pre-market" className="mt-4">
+              <JournalMarketSection
+                selectedJournal={preData}
+                setShowAddReviewDrawer={setShowAddReviewDrawer}
+                text='Pre Market'
+              />
+            </TabsContent>
+            <TabsContent value="post-market" className="mt-4">
+              <JournalMarketSection
+                selectedJournal={postDatas}
+                setShowAddReviewDrawer={setShowAddReviewDrawer}
+                text='Post Market'
+              />
+            </TabsContent>
+            <TabsContent value="profit-loss" className="mt-4">
+              <div className='border p-2 overflow-auto shadow-md'>
+                <h2 className='text-xl mb-2'>Profit & Loss</h2>
+                <CustomTable
+                  columns={profitLossColumns}
+                  data={positions}
+                  totalDocuments={positions.length}
+                  loading={loading}
+                />
+              </div>
+            </TabsContent>
+            <TabsContent value="reviews" className="mt-4">
+              <ReviewDrawer
+                selectedJournal={selectedJournal}
+                setShowAddReviewDrawer={setShowAddReviewDrawer}
+                fileList={fileList}
+                setFileList={setFileList}
+                isUploading={isUploading}
+                handleUpload={handleUpload}
+              />
+            </TabsContent>
+          </Tabs>
+        )}
+
+        <Drawer
+          width={'60%'}
+          onClose={() => setShowAddReviewDrawer(false)}
+          open={showAddReviewDrawer}
+        >
+          <h1 className='text-xl border-b-[0.4px] border-slate-300 pb-2 mb-2'>
+            Add Review
+          </h1>
+          <AntdForm onFinish={form.handleSubmit(onSubmit)} layout='vertical'>
+            <AntdForm.Item
+              label="Review"
+              validateStatus={form.formState.errors.review ? 'error' : ''}
+              help={form.formState.errors.review?.message}
+            >
+              <Controller
+                name='review'
+                control={form.control}
+                render={({ field }) => (
+                  <TextArea {...field} />
+                )}
+              />
+            </AntdForm.Item>
+
+            <AntdForm.Item
+              label="Add Rating"
+              validateStatus={form.formState.errors.rating ? 'error' : ''}
+              help={form.formState.errors.rating?.message}
+            >
+              <Controller
+                name='rating'
+                control={form.control}
+                render={({ field }) => <Rate {...field} />}
+              />
+            </AntdForm.Item>
+
+            <AntdForm.Item>
+              <CustomButton
+                type='primary'
+                htmlType='submit'
+                className='text-xl py-5 bg-dark-teal rounded-md'
+                isLoading={isReviewAdding}
+                disabled={isReviewAdding}
+              >
+                {loading ? '' : 'Add Review'}
+              </CustomButton>
+            </AntdForm.Item>
+          </AntdForm>
+        </Drawer>
+      </Drawer>
+    </>
+  );
+};
+
+export default JournalDrawer;
