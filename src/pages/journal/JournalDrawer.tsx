@@ -124,6 +124,7 @@ const JournalDrawer: React.FC<JournalDrawerProps> = ({
               setFileList={setFileList}
               isUploading={isUploading}
               handleUpload={handleUpload}
+              onSubmit={onSubmit}
             />
           </div>
         ) : (
@@ -167,6 +168,7 @@ const JournalDrawer: React.FC<JournalDrawerProps> = ({
                 setFileList={setFileList}
                 isUploading={isUploading}
                 handleUpload={handleUpload}
+                onSubmit={onSubmit}
               />
             </TabsContent>
           </Tabs>
@@ -177,48 +179,15 @@ const JournalDrawer: React.FC<JournalDrawerProps> = ({
           onClose={() => setShowAddReviewDrawer(false)}
           open={showAddReviewDrawer}
         >
-          <h1 className='text-xl border-b-[0.4px] border-slate-300 pb-2 mb-2'>
-            Add Review
-          </h1>
-          <AntdForm onFinish={form.handleSubmit(onSubmit)} layout='vertical'>
-            <AntdForm.Item
-              label="Review"
-              validateStatus={form.formState.errors.review ? 'error' : ''}
-              help={form.formState.errors.review?.message}
-            >
-              <Controller
-                name='review'
-                control={form.control}
-                render={({ field }) => (
-                  <TextArea {...field} />
-                )}
-              />
-            </AntdForm.Item>
-
-            <AntdForm.Item
-              label="Add Rating"
-              validateStatus={form.formState.errors.rating ? 'error' : ''}
-              help={form.formState.errors.rating?.message}
-            >
-              <Controller
-                name='rating'
-                control={form.control}
-                render={({ field }) => <Rate {...field} />}
-              />
-            </AntdForm.Item>
-
-            <AntdForm.Item>
-              <CustomButton
-                type='primary'
-                htmlType='submit'
-                className='text-xl py-5 bg-dark-teal rounded-md'
-                isLoading={isReviewAdding}
-                disabled={isReviewAdding}
-              >
-                {loading ? '' : 'Add Review'}
-              </CustomButton>
-            </AntdForm.Item>
-          </AntdForm>
+          <ReviewDrawer
+            selectedJournal={selectedJournal}
+            setShowAddReviewDrawer={setShowAddReviewDrawer}
+            fileList={fileList}
+            setFileList={setFileList}
+            isUploading={isUploading}
+            handleUpload={handleUpload}
+            onSubmit={onSubmit}
+          />
         </Drawer>
       </Drawer>
     </>

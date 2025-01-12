@@ -245,6 +245,8 @@ const Journal = () => {
     }
   ]
   const onSubmit: SubmitHandler<IFormInput> = async formData => {
+
+    console.log("=====ON SUBMIT =====", formData)
     try {
       await postData({ value: formData.review, rating: formData.rating })
       if (addReviewError) {
