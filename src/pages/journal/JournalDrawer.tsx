@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
-import { Button, Drawer, Rate, Form as AntdForm } from 'antd';
-import { Controller, SubmitHandler, UseFormReturn } from 'react-hook-form';
-import TextArea from 'antd/es/input/TextArea';
+import React, { useEffect, useState } from 'react';
+import { Button, Drawer } from 'antd';
+import { SubmitHandler, UseFormReturn } from 'react-hook-form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./Tabs";
 import JournalMarketSection from '../../components/journal-section/JournalMarketSection';
 import CustomTable from '../../components/common/table/CustomTable';
-import CustomButton from '../../components/ui/button/Button';
 import { profitLossColumns } from './profitLossColumnsData';
 import { LayoutGrid, LayoutPanelTop } from 'lucide-react';
 import ReviewDrawer from './ReviewDrawer';
@@ -54,11 +52,20 @@ const JournalDrawer: React.FC<JournalDrawerProps> = ({
   handleUpload,
   loading,
   positions,
-  form,
-  isReviewAdding,
+  // form,
+  // isReviewAdding,
   onSubmit
 }) => {
   const [isGridView, setIsGridView] = useState(false);
+  const [hasReview, setHasReview] = useState(false);
+
+  useEffect(() => {
+    if (selectedJournal?.reviewId) {
+      setHasReview(true);
+    } else {
+      setHasReview(false);
+    }
+  }, [selectedJournal]);
 
   const switchButton = (
     <div className="flex  justify-between items-center w-full">
@@ -118,6 +125,7 @@ const JournalDrawer: React.FC<JournalDrawerProps> = ({
               />
             </div>
             <ReviewDrawer
+              hasReview={hasReview}
               selectedJournal={selectedJournal}
               setShowAddReviewDrawer={setShowAddReviewDrawer}
               fileList={fileList}
@@ -162,6 +170,7 @@ const JournalDrawer: React.FC<JournalDrawerProps> = ({
             </TabsContent>
             <TabsContent value="reviews" className="mt-4">
               <ReviewDrawer
+                hasReview={hasReview}
                 selectedJournal={selectedJournal}
                 setShowAddReviewDrawer={setShowAddReviewDrawer}
                 fileList={fileList}
@@ -180,6 +189,7 @@ const JournalDrawer: React.FC<JournalDrawerProps> = ({
           open={showAddReviewDrawer}
         >
           <ReviewDrawer
+            hasReview={hasReview}
             selectedJournal={selectedJournal}
             setShowAddReviewDrawer={setShowAddReviewDrawer}
             fileList={fileList}

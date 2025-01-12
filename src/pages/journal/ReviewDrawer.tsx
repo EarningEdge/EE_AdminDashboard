@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Carousel, CarouselProps, Tag, Rate, Upload, Spin, Input, message } from 'antd';
+import { Button, Carousel, CarouselProps, Tag, Rate, Spin, Input, message } from 'antd';
 import { LoadingOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { SubmitHandler } from 'react-hook-form';
 import axios from 'axios';
@@ -13,6 +13,7 @@ interface IFormInput {
 }
 
 interface ReviewDrawerProps {
+  hasReview: boolean;
   selectedJournal: any;
   setShowAddReviewDrawer: (show: boolean) => void;
   fileList: any[];
@@ -23,12 +24,13 @@ interface ReviewDrawerProps {
 }
 
 const ReviewDrawer: React.FC<ReviewDrawerProps> = ({
+  hasReview,
   selectedJournal,
   setShowAddReviewDrawer,
-  fileList,
-  setFileList,
-  isUploading,
-  handleUpload,
+  // fileList,
+  // setFileList,
+  // isUploading,
+  // handleUpload,
   onSubmit
 }) => {
   const [isGeneratingReview, setIsGeneratingReview] = useState(false);
@@ -45,22 +47,23 @@ const ReviewDrawer: React.FC<ReviewDrawerProps> = ({
     slidesToScroll: 1
   };
 
-  const uploadProps = {
-    onRemove: (file: any) => {
-      setFileList(fileList.filter(f => f.uid !== file.uid));
-    },
-    beforeUpload: (file: any) => {
-      setFileList([...fileList, file]);
-      return false;
-    },
-    fileList
-  };
+  // const uploadProps = {
+  //   onRemove: (file: any) => {
+  //     setFileList(fileList.filter(f => f.uid !== file.uid));
+  //   },
+  //   beforeUpload: (file: any) => {
+  //     setFileList([...fileList, file]);
+  //     return false;
+  //   },
+  //   fileList
+  // };
 
-  // Update reviewText and rating
+
+  // Empty the reviewText and rating when a new journal is selected
   useEffect(() => {
     setReviewText('');
     setRating(0);
-  }, []);
+  }, [selectedJournal]);
 
 
   const generateAIReview = async () => {
@@ -89,10 +92,10 @@ const ReviewDrawer: React.FC<ReviewDrawerProps> = ({
       return;
     }
 
-
     onSubmit({ review: reviewText, rating });
-
     message.success('Review submitted successfully!');
+    setReviewText('');
+    setRating(0);
     setShowAddReviewDrawer(false);
   };
 
@@ -101,18 +104,13 @@ const ReviewDrawer: React.FC<ReviewDrawerProps> = ({
       <div className='border-b-[0.5px] border-slate-300 mb-4'>
         <div className='flex justify-between items-center'>
           <h1 className='text-xl font-semibold'>Review</h1>
-          {!selectedJournal?.reviewId && (
+          {!hasReview && (
             <Button
               type="primary"
               icon={<ThunderboltOutlined className="text-yellow-200 text-lg" />}
               onClick={generateAIReview}
               loading={isGeneratingReview}
-              className="
-              m-2
-              h-auto py-2 px-4
-              flex items-center gap-2
-              bg-blue-500
-            "
+              className="m-2 h-auto py-2 px-4 flex items-center gap-2 bg-blue-500"
             >
               <span className="font-medium tracking-wide">Generate AI Review</span>
             </Button>
@@ -120,38 +118,7 @@ const ReviewDrawer: React.FC<ReviewDrawerProps> = ({
         </div>
       </div>
 
-      {/* Only show emotions if they exist */}
-      {selectedJournal?.emotion?.value && (
-        <div className='border-b-[0.5px] border-slate-300 pb-3 mb-4'>
-          <h1 className='text-xl font-medium mb-2'>Emotions:</h1>
-          <div className='w-full text-sm text-gray-600 px-4 py-3 rounded-md bg-slate-50 border-[0.5px] border-slate-300'>
-            {selectedJournal.emotion.value}
-          </div>
-        </div>
-      )}
 
-      {/* Only show uploads if they exist */}
-      {selectedJournal?.uploads?.length > 0 && (
-        <div className='border-b-[0.5px] border-slate-300 pb-3 mb-4'>
-          <h1 className='text-xl font-medium mb-2'>Uploads:</h1>
-          <Carousel {...settings}>
-            {selectedJournal.uploads.map((upload: any, ind: number) => (
-              <div className='border-slate-200 border rounded-md' key={ind}>
-                <img
-                  src={upload.fileUrl}
-                  alt={`Upload ${ind + 1}`}
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                    maxHeight: '150px',
-                    objectFit: 'contain'
-                  }}
-                />
-              </div>
-            ))}
-          </Carousel>
-        </div>
-      )}
 
       <div className='space-y-4'>
         {isGeneratingReview ? (
@@ -201,6 +168,39 @@ const ReviewDrawer: React.FC<ReviewDrawerProps> = ({
           </>
         )}
       </div>
+
+      {/* Only show emotions if they exist */}
+      {selectedJournal?.emotion?.value && (
+        <div className='border-b-[0.5px] border-slate-300 pb-3 mb-4'>
+          <h1 className='text-xl font-medium mb-2'>Emotions:</h1>
+          <div className='w-full text-sm text-gray-600 px-4 py-3 rounded-md bg-slate-50 border-[0.5px] border-slate-300'>
+            {selectedJournal.emotion.value}
+          </div>
+        </div>
+      )}
+
+      {/* Only show uploads if they exist */}
+      {selectedJournal?.uploads?.length > 0 && (
+        <div className='border-b-[0.5px] border-slate-300 pb-3 mb-4'>
+          <h1 className='text-xl font-medium mb-2'>Uploads:</h1>
+          <Carousel {...settings}>
+            {selectedJournal.uploads.map((upload: any, ind: number) => (
+              <div className='border-slate-200 border rounded-md' key={ind}>
+                <img
+                  src={upload.fileUrl}
+                  alt={`Upload ${ind + 1}`}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    maxHeight: '150px',
+                    objectFit: 'contain'
+                  }}
+                />
+              </div>
+            ))}
+          </Carousel>
+        </div>
+      )}
     </div>
   );
 };

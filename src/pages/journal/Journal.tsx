@@ -52,10 +52,10 @@ const darkTheme = {
     itemActiveBg: '#ffffff',
     itemColor: '#ffffff',
     itemHoverBg: '#ffffff'
-
-    // Add more tokens as needed
   }
 }
+
+
 const Journal = () => {
   const user = useAppSelector(state => state.auth.user)
   const [showSideDrawer, setShowSideDrawer] = useState(false)
@@ -67,6 +67,8 @@ const Journal = () => {
   const [fileList, setFileList] = useState<any[]>([])
   const { RangePicker } = DatePicker
   const [positions, setPositions] = useState([]);
+
+
   // const [positionsLoading, setPositionsLoading] = useState(false);
   const fetchPositions = async () => {
     if (!selectedJournal?.userId?._id) return;
@@ -92,18 +94,17 @@ const Journal = () => {
   })
 
   const {
-    // data,
     loading: isReviewAdding,
     error: addReviewError,
     postData
   } = usePostData<any, any>(`/review/add/${user?.role}/${selectedJournal?._id}`)
+
   if (!user) {
     return <Navigate to={'/login'} />
   }
   const {
     data: journalData,
     loading,
-    // error,
     fetchData
   } = useFetchData<any>(
     `journal/all/${user.role}?searchTerm=${filters.searchTerm}&type=${filters.journalType
@@ -148,13 +149,13 @@ const Journal = () => {
     }
   }
 
+
   const handleViewClick = (journal: any) => {
     setSelectedJournal(journal)
 
     const journalDate = new Date(journal.createdAt).toISOString().split('T')[0] // Extract the date part
 
     if (journal.type === 'exit') {
-      // Assuming `journalData.data` holds all your journal entries
       const entryForSameDate = journalData.data.filter(
         (item: any) =>
           item.date === journal.date &&
@@ -244,18 +245,23 @@ const Journal = () => {
       )
     }
   ]
-  const onSubmit: SubmitHandler<IFormInput> = async formData => {
 
-    console.log("=====ON SUBMIT =====", formData)
+  const onSubmit: SubmitHandler<IFormInput> = async formData => {
     try {
       await postData({ value: formData.review, rating: formData.rating })
       if (addReviewError) {
         message.error(addReviewError.message)
-      } else message.success('Review Added')
+      } else {
+        message.success('Review Added')
+        setRefresh(prev => !prev)
+        setShowAddReviewDrawer(false)
+        setShowSideDrawer(false)
+      }
     } catch (error: any) {
       message.error(error?.message || 'Failed to add')
     }
   }
+
   const refreshTable = () => {
     setRefresh(!refresh)
   }
@@ -303,6 +309,7 @@ const Journal = () => {
               />
             </div>
           </div>
+
           <JournalDrawer
             showSideDrawer={showSideDrawer}
             setShowSideDrawer={setShowSideDrawer}
